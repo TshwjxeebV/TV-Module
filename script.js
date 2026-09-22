@@ -1,19 +1,19 @@
 const speechEngine = window.speechSynthesis;
 let audioEnabled = false;
-let associateVoice = { pitch: 0.85, type: 'male' }; 
+let associateVoice = { pitch: 0.85, type: 'male' };
 let systemVoices = [];
 
 speechEngine.onvoiceschanged = () => { systemVoices = speechEngine.getVoices(); };
 
 function playSpeech(text, profile = { pitch: 1.0, type: 'neutral' }) {
     if (!audioEnabled || !text) return;
-    speechEngine.cancel(); 
-    
-    const cleanText = text.replace(/<[^>]*>?/gm, ''); 
+    speechEngine.cancel();
+
+    const cleanText = text.replace(/<[^>]*>?/gm, '');
     const utterance = new SpeechSynthesisUtterance(cleanText);
     utterance.pitch = profile.pitch;
-    utterance.rate = 1.05; 
-    
+    utterance.rate = 1.05;
+
     if (systemVoices.length > 0) {
         let voice = null;
         if (profile.type === 'male') {
@@ -30,10 +30,10 @@ function playSpeech(text, profile = { pitch: 1.0, type: 'neutral' }) {
 
 document.getElementById('btn-audio-toggle').addEventListener('click', (e) => {
     audioEnabled = !audioEnabled;
-    if(!audioEnabled) speechEngine.cancel();
-    
+    if (!audioEnabled) speechEngine.cancel();
+
     e.currentTarget.innerText = audioEnabled ? "Audio Narration: ON" : "Audio Narration: OFF";
-    
+
     if (audioEnabled) {
         e.currentTarget.classList.remove('pulse-anim');
         e.currentTarget.style.borderColor = "var(--accent)";
@@ -57,11 +57,11 @@ document.getElementById('btn-audio-toggle').addEventListener('click', (e) => {
 
 document.getElementById('btn-mini-audio').addEventListener('click', (e) => {
     audioEnabled = !audioEnabled;
-    if(!audioEnabled) speechEngine.cancel();
+    if (!audioEnabled) speechEngine.cancel();
     e.currentTarget.innerText = audioEnabled ? "🔊 Audio: ON" : "🔊 Audio: OFF";
     e.currentTarget.style.borderColor = audioEnabled ? "var(--accent)" : "#ff3b30";
     e.currentTarget.style.color = audioEnabled ? "var(--accent)" : "#ff3b30";
-    
+
     const mainToggle = document.getElementById('btn-audio-toggle');
     mainToggle.innerText = audioEnabled ? "Audio Narration: ON" : "Audio Narration: OFF";
     if (audioEnabled) {
@@ -75,7 +75,7 @@ document.getElementById('btn-mini-audio').addEventListener('click', (e) => {
 });
 
 document.getElementById('btn-voice-male').addEventListener('click', (e) => {
-    audioEnabled = true; 
+    audioEnabled = true;
     document.getElementById('btn-mini-audio').style.display = 'block';
     document.getElementById('btn-mini-audio').innerText = "🔊 Audio: ON";
     document.getElementById('btn-mini-audio').style.borderColor = "var(--accent)";
@@ -83,7 +83,7 @@ document.getElementById('btn-voice-male').addEventListener('click', (e) => {
     document.getElementById('btn-audio-toggle').innerText = "Audio Narration: ON";
     document.getElementById('btn-audio-toggle').classList.remove('pulse-anim');
     document.getElementById('btn-audio-toggle').style.backgroundColor = "rgba(102, 252, 241, 0.15)";
-    
+
     associateVoice = { pitch: 0.85, type: 'male' };
     e.currentTarget.classList.add('active');
     document.getElementById('btn-voice-female').classList.remove('active');
@@ -91,7 +91,7 @@ document.getElementById('btn-voice-male').addEventListener('click', (e) => {
 });
 
 document.getElementById('btn-voice-female').addEventListener('click', (e) => {
-    audioEnabled = true; 
+    audioEnabled = true;
     document.getElementById('btn-mini-audio').style.display = 'block';
     document.getElementById('btn-mini-audio').innerText = "🔊 Audio: ON";
     document.getElementById('btn-mini-audio').style.borderColor = "var(--accent)";
@@ -99,7 +99,7 @@ document.getElementById('btn-voice-female').addEventListener('click', (e) => {
     document.getElementById('btn-audio-toggle').innerText = "Audio Narration: ON";
     document.getElementById('btn-audio-toggle').classList.remove('pulse-anim');
     document.getElementById('btn-audio-toggle').style.backgroundColor = "rgba(102, 252, 241, 0.15)";
-    
+
     associateVoice = { pitch: 1.15, type: 'female' };
     e.currentTarget.classList.add('active');
     document.getElementById('btn-voice-male').classList.remove('active');
@@ -111,7 +111,7 @@ class UIChime {
         this.ctx = new (window.AudioContext || window.webkitAudioContext)();
         this.initialized = false;
         this.fireWindNode = null;
-        this.brownFilter = null; 
+        this.brownFilter = null;
         this.fireWindGainL = null;
         this.fireWindGainR = null;
         this.panL = null;
@@ -121,18 +121,21 @@ class UIChime {
         this.themeMasterGain = null;
         this.spaceChargeOsc = null;
         this.spaceChargeGain = null;
-        this.chargeFilter = null; 
+        this.chargeFilter = null;
         this.supernovaCompressor = null;
         this.supernovaFilter = null;
+        this.garageHumOsc = null;
+        this.garageHumGain = null;
+        this.garageHumFilter = null;
     }
-    
+
     init() {
         if (!this.initialized) {
             this.ctx.resume();
-            
+
             this.hoverOsc = this.ctx.createOscillator();
             this.hoverOsc.type = 'triangle';
-            this.hoverOsc.frequency.value = 45; 
+            this.hoverOsc.frequency.value = 45;
             this.hoverFilter = this.ctx.createBiquadFilter();
             this.hoverFilter.type = 'lowpass';
             this.hoverFilter.frequency.value = 100;
@@ -142,12 +145,12 @@ class UIChime {
             this.hoverFilter.connect(this.hoverGain);
             this.hoverGain.connect(this.ctx.destination);
             this.hoverOsc.start();
-            
+
             const bufferSize = this.ctx.sampleRate * 2;
             this.noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
             const data = this.noiseBuffer.getChannelData(0);
             for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
-            
+
             this.initialized = true;
         }
     }
@@ -160,11 +163,11 @@ class UIChime {
             this.supernovaCompressor.ratio.value = 12;
             this.supernovaCompressor.attack.value = 0.01;
             this.supernovaCompressor.release.value = 0.25;
-            
+
             this.supernovaFilter = this.ctx.createBiquadFilter();
             this.supernovaFilter.type = 'lowpass';
-            this.supernovaFilter.frequency.value = 400; 
-            
+            this.supernovaFilter.frequency.value = 400;
+
             this.supernovaFilter.connect(this.supernovaCompressor);
             this.supernovaCompressor.connect(this.ctx.destination);
         }
@@ -174,28 +177,28 @@ class UIChime {
         if (!this.initialized) return;
         const t = this.ctx.currentTime;
         this.humActive = false;
-        if(this.hoverGain) {
+        if (this.hoverGain) {
             this.hoverGain.gain.cancelScheduledValues(t);
             this.hoverGain.gain.setValueAtTime(0, t);
         }
-        if(this.fireWindGainL) {
+        if (this.fireWindGainL) {
             this.fireWindGainL.gain.cancelScheduledValues(t);
             this.fireWindGainL.gain.setValueAtTime(0, t);
         }
-        if(this.fireWindGainR) {
+        if (this.fireWindGainR) {
             this.fireWindGainR.gain.cancelScheduledValues(t);
             this.fireWindGainR.gain.setValueAtTime(0, t);
         }
-        if(this.fireWindNode) {
-            try { this.fireWindNode.stop(); this.fireWindNode.disconnect(); } catch(e){}
+        if (this.fireWindNode) {
+            try { this.fireWindNode.stop(); this.fireWindNode.disconnect(); } catch (e) { }
             this.fireWindNode = null;
         }
-        if(this.spaceChargeGain) {
+        if (this.spaceChargeGain) {
             this.spaceChargeGain.gain.cancelScheduledValues(t);
             this.spaceChargeGain.gain.setValueAtTime(0, t);
         }
-        if(this.spaceChargeOsc) {
-            try { this.spaceChargeOsc.stop(); this.spaceChargeOsc.disconnect(); } catch(e){}
+        if (this.spaceChargeOsc) {
+            try { this.spaceChargeOsc.stop(); this.spaceChargeOsc.disconnect(); } catch (e) { }
             this.spaceChargeOsc = null;
         }
     }
@@ -203,27 +206,27 @@ class UIChime {
     startSuperSnap() {
         if (!this.initialized) return;
         const t = this.ctx.currentTime;
-        if(this.spaceChargeGain) { this.spaceChargeGain.gain.cancelScheduledValues(t); this.spaceChargeGain.gain.setValueAtTime(0, t); }
-        if(this.spaceChargeOsc) { try { this.spaceChargeOsc.stop(t); this.spaceChargeOsc.disconnect(); } catch(e){} this.spaceChargeOsc = null; }
+        if (this.spaceChargeGain) { this.spaceChargeGain.gain.cancelScheduledValues(t); this.spaceChargeGain.gain.setValueAtTime(0, t); }
+        if (this.spaceChargeOsc) { try { this.spaceChargeOsc.stop(t); this.spaceChargeOsc.disconnect(); } catch (e) { } this.spaceChargeOsc = null; }
 
         const noise = this.ctx.createBufferSource();
         noise.buffer = this.noiseBuffer;
         noise.loop = true;
-        
+
         const vacFilter = this.ctx.createBiquadFilter();
         vacFilter.type = 'lowpass';
         vacFilter.frequency.setValueAtTime(1500, t);
         vacFilter.frequency.exponentialRampToValueAtTime(40, t + 0.25);
-        
+
         const vacGain = this.ctx.createGain();
         vacGain.gain.setValueAtTime(0.5, t);
         vacGain.gain.linearRampToValueAtTime(0.01, t + 0.25);
-        vacGain.gain.setValueAtTime(0, t + 0.29); 
-        
+        vacGain.gain.setValueAtTime(0, t + 0.29);
+
         noise.connect(vacFilter);
         vacFilter.connect(vacGain);
         vacGain.connect(this.supernovaFilter);
-        
+
         noise.start(t);
         noise.stop(t + 0.3);
     }
@@ -232,34 +235,34 @@ class UIChime {
         if (this.ctx.state === 'suspended') return;
         this.initSupernovaBus();
         const t = this.ctx.currentTime;
-        
+
         if (this.spaceChargeGain) {
             this.spaceChargeGain.gain.cancelScheduledValues(t);
             this.spaceChargeGain.gain.setValueAtTime(0, t);
         }
         if (this.spaceChargeOsc) {
-            try { this.spaceChargeOsc.stop(t); this.spaceChargeOsc.disconnect(); } catch(e){}
+            try { this.spaceChargeOsc.stop(t); this.spaceChargeOsc.disconnect(); } catch (e) { }
             this.spaceChargeOsc = null;
         }
-        
+
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
         osc.type = 'sine';
         osc.frequency.setValueAtTime(800 + Math.random() * 400, t);
         osc.frequency.exponentialRampToValueAtTime(1200, t + 0.1);
-        
+
         gain.gain.setValueAtTime(0, t);
         gain.gain.linearRampToValueAtTime(0.05, t + 0.01);
         gain.gain.linearRampToValueAtTime(0, t + 0.25);
-        
-        osc.connect(gain); 
-        gain.connect(this.supernovaFilter); 
-        
-        osc.start(t); 
-        osc.stop(t + 0.25); 
-        
+
+        osc.connect(gain);
+        gain.connect(this.supernovaFilter);
+
+        osc.start(t);
+        osc.stop(t + 0.25);
+
         setTimeout(() => {
-            try { osc.disconnect(); gain.disconnect(); } catch(e){}
+            try { osc.disconnect(); gain.disconnect(); } catch (e) { }
         }, 300);
     }
 
@@ -268,19 +271,19 @@ class UIChime {
         this.initSupernovaBus();
         const t = this.ctx.currentTime;
         if (this.spaceChargeOsc) {
-            try { this.spaceChargeOsc.stop(); this.spaceChargeOsc.disconnect(); } catch(e){}
+            try { this.spaceChargeOsc.stop(); this.spaceChargeOsc.disconnect(); } catch (e) { }
         }
         this.spaceChargeOsc = this.ctx.createOscillator();
         this.spaceChargeOsc.type = 'sine';
         this.spaceChargeOsc.frequency.setValueAtTime(40, t);
-        
+
         this.spaceChargeGain = this.ctx.createGain();
         this.spaceChargeGain.gain.setValueAtTime(0, t);
 
         this.chargeFilter = this.ctx.createBiquadFilter();
         this.chargeFilter.type = 'lowpass';
         this.chargeFilter.frequency.setValueAtTime(20000, t);
-        
+
         this.spaceChargeOsc.connect(this.spaceChargeGain);
         this.spaceChargeGain.connect(this.chargeFilter);
         this.chargeFilter.connect(this.supernovaFilter);
@@ -290,7 +293,7 @@ class UIChime {
     updateSupernovaCharge(chargeLevel) {
         if (!this.spaceChargeOsc || !this.spaceChargeGain || !this.chargeFilter) return;
         const t = this.ctx.currentTime;
-        
+
         if (chargeLevel >= 3.0 && chargeLevel < 3.15) {
             this.chargeFilter.frequency.setTargetAtTime(150, t, 0.05);
         } else if (chargeLevel >= 3.3) {
@@ -309,25 +312,25 @@ class UIChime {
         if (!this.initialized) return;
         this.initSupernovaBus();
         const t = this.ctx.currentTime;
-        
+
         const burstOsc = this.ctx.createOscillator();
         const burstGain = this.ctx.createGain();
         burstOsc.type = 'triangle';
         burstOsc.frequency.setValueAtTime(80, t);
         burstOsc.frequency.exponentialRampToValueAtTime(30, t + 1.0);
-        
+
         burstGain.gain.setValueAtTime(0, t);
         burstGain.gain.linearRampToValueAtTime(0.15, t + 0.1);
         burstGain.gain.exponentialRampToValueAtTime(0.001, t + 2.5);
-        
+
         const dopFilter = this.ctx.createBiquadFilter();
         dopFilter.type = 'lowpass';
-        dopFilter.frequency.setValueAtTime(500, t); 
-        
-        burstOsc.connect(burstGain); 
+        dopFilter.frequency.setValueAtTime(500, t);
+
+        burstOsc.connect(burstGain);
         burstGain.connect(dopFilter);
         dopFilter.connect(this.supernovaFilter);
-        
+
         burstOsc.start(t); burstOsc.stop(t + 2.6);
     }
 
@@ -335,20 +338,20 @@ class UIChime {
         if (!this.initialized) return;
         this.initSupernovaBus();
         const t = this.ctx.currentTime;
-        
-        if(this.spaceChargeGain) {
+
+        if (this.spaceChargeGain) {
             this.spaceChargeGain.gain.cancelScheduledValues(t);
             this.spaceChargeGain.gain.setValueAtTime(this.spaceChargeGain.gain.value, t);
             this.spaceChargeGain.gain.exponentialRampToValueAtTime(0.001, t + 0.1);
         }
-        if(this.spaceChargeOsc) {
-            try { this.spaceChargeOsc.stop(t + 0.2); } catch(e){}
+        if (this.spaceChargeOsc) {
+            try { this.spaceChargeOsc.stop(t + 0.2); } catch (e) { }
         }
-        
+
         const burstOsc = this.ctx.createOscillator();
         burstOsc.type = 'sine';
         burstOsc.frequency.setValueAtTime(45, t);
-        burstOsc.frequency.exponentialRampToValueAtTime(15, t + 4.0); 
+        burstOsc.frequency.exponentialRampToValueAtTime(15, t + 4.0);
 
         const distOsc = this.ctx.createOscillator();
         distOsc.type = 'sawtooth';
@@ -357,39 +360,83 @@ class UIChime {
 
         const modGain = this.ctx.createGain();
         modGain.gain.value = 0.5;
-        
+
         const modOsc = this.ctx.createOscillator();
         modOsc.type = 'sine';
-        modOsc.frequency.setValueAtTime(18, t); 
-        modOsc.frequency.exponentialRampToValueAtTime(3, t + 5.0); 
-        
+        modOsc.frequency.setValueAtTime(18, t);
+        modOsc.frequency.exponentialRampToValueAtTime(3, t + 5.0);
+
         const modScale = this.ctx.createGain();
         modScale.gain.value = 0.5;
-        
+
         modOsc.connect(modScale);
         modScale.connect(modGain.gain);
-        
+
         const burstGain = this.ctx.createGain();
         burstGain.gain.setValueAtTime(0, t);
         burstGain.gain.linearRampToValueAtTime(1.0, t + 0.05);
         burstGain.gain.exponentialRampToValueAtTime(0.001, t + 7.5);
-        
+
         const subFilter = this.ctx.createBiquadFilter();
         subFilter.type = 'lowpass';
         subFilter.frequency.setValueAtTime(400, t);
         subFilter.frequency.exponentialRampToValueAtTime(30, t + 7.5);
-        
+
         burstOsc.connect(modGain);
         distOsc.connect(modGain);
         modGain.connect(burstGain);
         burstGain.connect(subFilter);
         subFilter.connect(this.supernovaCompressor);
-        
+
         burstOsc.start(t); burstOsc.stop(t + 7.6);
         distOsc.start(t); distOsc.stop(t + 7.6);
         modOsc.start(t); modOsc.stop(t + 7.6);
     }
+    startGarageHum() {
+        if (!this.initialized || this.ctx.state === 'suspended') return;
+        if (this.garageHumOsc) return;
 
+        const t = this.ctx.currentTime;
+
+        this.garageHumOsc = this.ctx.createOscillator();
+        this.garageHumOsc.type = 'sawtooth';
+        this.garageHumOsc.frequency.setValueAtTime(60, t);
+
+        this.garageHumFilter = this.ctx.createBiquadFilter();
+        this.garageHumFilter.type = 'lowpass';
+        this.garageHumFilter.frequency.setValueAtTime(150, t);
+
+        this.garageHumGain = this.ctx.createGain();
+        this.garageHumGain.gain.setValueAtTime(0, t);
+        this.garageHumGain.gain.linearRampToValueAtTime(0.04, t + 1.0);
+
+        this.garageHumOsc.connect(this.garageHumFilter);
+        this.garageHumFilter.connect(this.garageHumGain);
+        this.garageHumGain.connect(this.ctx.destination);
+
+        this.garageHumOsc.start(t);
+    }
+
+    stopGarageHum() {
+        if (!this.garageHumOsc || !this.garageHumGain) return;
+        const t = this.ctx.currentTime;
+        this.garageHumGain.gain.cancelScheduledValues(t);
+        this.garageHumGain.gain.setValueAtTime(this.garageHumGain.gain.value, t);
+        this.garageHumGain.gain.linearRampToValueAtTime(0, t + 0.5);
+
+        this.garageHumOsc.stop(t + 0.6);
+
+        setTimeout(() => {
+            try {
+                this.garageHumOsc.disconnect();
+                this.garageHumFilter.disconnect();
+                this.garageHumGain.disconnect();
+            } catch (e) { }
+            this.garageHumOsc = null;
+            this.garageHumGain = null;
+            this.garageHumFilter = null;
+        }, 700);
+    }
     playWarpSound() {
         if (this.ctx.state === 'suspended') this.ctx.resume();
         const t = this.ctx.currentTime;
@@ -412,7 +459,7 @@ class UIChime {
             osc.connect(gain); gain.connect(masterGain); osc.start(start); osc.stop(start + 1.3);
         });
         const pullOsc = this.ctx.createOscillator(); const pullGain = this.ctx.createGain(); pullOsc.type = 'sawtooth';
-        pullOsc.frequency.setValueAtTime(40, t); pullOsc.frequency.exponentialRampToValueAtTime(440, t + 1.0); 
+        pullOsc.frequency.setValueAtTime(40, t); pullOsc.frequency.exponentialRampToValueAtTime(440, t + 1.0);
         const pullFilter = this.ctx.createBiquadFilter(); pullFilter.type = 'lowpass'; pullFilter.frequency.setValueAtTime(200, t); pullFilter.frequency.exponentialRampToValueAtTime(1200, t + 1.0);
         pullGain.gain.setValueAtTime(0, t); pullGain.gain.linearRampToValueAtTime(0.5, t + 0.3); pullGain.gain.exponentialRampToValueAtTime(0.001, t + 1.2);
         pullOsc.connect(pullFilter); pullFilter.connect(pullGain); pullGain.connect(masterGain); pullOsc.start(t); pullOsc.stop(t + 1.3);
@@ -421,17 +468,17 @@ class UIChime {
 
     stopCompletionTheme() {
         if (this.activeThemeNodes.length > 0) {
-            this.activeThemeNodes.forEach(node => { try { node.stop(); node.disconnect(); } catch (e) {} });
+            this.activeThemeNodes.forEach(node => { try { node.stop(); node.disconnect(); } catch (e) { } });
         }
         this.activeThemeNodes = [];
-        if (this.themeMasterGain) { try { this.themeMasterGain.gain.cancelScheduledValues(this.ctx.currentTime); this.themeMasterGain.gain.setValueAtTime(0, this.ctx.currentTime); this.themeMasterGain.disconnect(); } catch(e) {} }
+        if (this.themeMasterGain) { try { this.themeMasterGain.gain.cancelScheduledValues(this.ctx.currentTime); this.themeMasterGain.gain.setValueAtTime(0, this.ctx.currentTime); this.themeMasterGain.disconnect(); } catch (e) { } }
     }
 
     playCompletionTheme() {
         if (this.ctx.state === 'suspended') this.ctx.resume();
-        this.stopCompletionTheme(); 
+        this.stopCompletionTheme();
         const t = this.ctx.currentTime;
-        
+
         this.themeMasterGain = this.ctx.createGain();
 
         const compressor = this.ctx.createDynamicsCompressor();
@@ -441,17 +488,17 @@ class UIChime {
         compressor.attack.setValueAtTime(0.003, t);
         compressor.release.setValueAtTime(0.25, t);
 
-        const breathFilter = this.ctx.createBiquadFilter(); 
-        breathFilter.type = 'lowpass'; 
-        breathFilter.frequency.setValueAtTime(600, t); 
-        breathFilter.frequency.exponentialRampToValueAtTime(1800, t + 1.5); 
-        breathFilter.frequency.exponentialRampToValueAtTime(300, t + 3.0); 
-        
-        this.themeMasterGain.connect(breathFilter); 
-        breathFilter.connect(compressor); 
-        compressor.connect(this.ctx.destination); 
-        
-        this.themeMasterGain.gain.setValueAtTime(0, t); 
+        const breathFilter = this.ctx.createBiquadFilter();
+        breathFilter.type = 'lowpass';
+        breathFilter.frequency.setValueAtTime(600, t);
+        breathFilter.frequency.exponentialRampToValueAtTime(1800, t + 1.5);
+        breathFilter.frequency.exponentialRampToValueAtTime(300, t + 3.0);
+
+        this.themeMasterGain.connect(breathFilter);
+        breathFilter.connect(compressor);
+        compressor.connect(this.ctx.destination);
+
+        this.themeMasterGain.gain.setValueAtTime(0, t);
         this.themeMasterGain.gain.linearRampToValueAtTime(0.20, t + 1.5);
 
         const playPianoKey = (freq, start, sustainDuration, peakVol) => {
@@ -466,41 +513,41 @@ class UIChime {
         };
 
         let time = t; const beat = 0.95;
-        playPianoKey(97.99,  time, beat * 1.5, 0.45); playPianoKey(196.00, time, beat * 1.5, 0.25); playPianoKey(246.94, time, beat * 1.5, 0.25); playPianoKey(493.88, time, beat * 0.7, 0.35); playPianoKey(554.37, time + (beat * 0.5), beat * 0.7, 0.38);
+        playPianoKey(97.99, time, beat * 1.5, 0.45); playPianoKey(196.00, time, beat * 1.5, 0.25); playPianoKey(246.94, time, beat * 1.5, 0.25); playPianoKey(493.88, time, beat * 0.7, 0.35); playPianoKey(554.37, time + (beat * 0.5), beat * 0.7, 0.38);
         time += beat; playPianoKey(110.00, time, beat * 1.5, 0.5); playPianoKey(220.00, time, beat * 1.5, 0.3); playPianoKey(277.18, time, beat * 1.5, 0.3); playPianoKey(587.33, time, beat * 0.7, 0.42); playPianoKey(659.25, time + (beat * 0.5), beat * 0.7, 0.45);
-        time += beat; playPianoKey(92.50,  time, beat * 2.0, 0.4); playPianoKey(185.00, time, beat * 2.0, 0.25); playPianoKey(554.37, time, beat * 0.8, 0.35);
+        time += beat; playPianoKey(92.50, time, beat * 2.0, 0.4); playPianoKey(185.00, time, beat * 2.0, 0.25); playPianoKey(554.37, time, beat * 0.8, 0.35);
         let ritard = time + (beat * 0.5) + 0.18; playPianoKey(440.00, ritard, beat * 1.2, 0.3);
-        
-        time = ritard + (beat * 0.5) + 0.35; const releaseDuration = 5.5; 
-        playPianoKey(73.42,  time,        releaseDuration, 0.55); 
-        playPianoKey(146.83, time + 0.08, releaseDuration, 0.3); 
-        playPianoKey(185.00, time + 0.16, releaseDuration, 0.25); 
-        playPianoKey(220.00, time + 0.24, releaseDuration, 0.25); 
-        playPianoKey(277.18, time + 0.32, releaseDuration, 0.3); 
+
+        time = ritard + (beat * 0.5) + 0.35; const releaseDuration = 5.5;
+        playPianoKey(73.42, time, releaseDuration, 0.55);
+        playPianoKey(146.83, time + 0.08, releaseDuration, 0.3);
+        playPianoKey(185.00, time + 0.16, releaseDuration, 0.25);
+        playPianoKey(220.00, time + 0.24, releaseDuration, 0.25);
+        playPianoKey(277.18, time + 0.32, releaseDuration, 0.3);
         playPianoKey(329.63, time + 0.40, releaseDuration, 0.35);
-        playPianoKey(587.33, time + 0.48, releaseDuration, 0.35); 
+        playPianoKey(587.33, time + 0.48, releaseDuration, 0.35);
     }
 
     setHoverState(isMoving, activeSprite) {
         if (!this.initialized || this.ctx.state === 'suspended' || !this.hoverGain) return;
         const t = this.ctx.currentTime;
         if (isMoving && activeSprite === 'cursor') {
-            if (!this.humActive) { 
-                this.humActive = true; 
+            if (!this.humActive) {
+                this.humActive = true;
                 this.hoverGain.gain.cancelScheduledValues(t);
                 this.hoverGain.gain.setValueAtTime(this.hoverGain.gain.value || 0, t);
-                this.hoverGain.gain.linearRampToValueAtTime(0.12, t + 0.05); 
-                this.hoverFilter.frequency.setTargetAtTime(400, t, 0.05); 
+                this.hoverGain.gain.linearRampToValueAtTime(0.12, t + 0.05);
+                this.hoverFilter.frequency.setTargetAtTime(400, t, 0.05);
             }
         } else {
-            if (this.humActive) { 
-                this.humActive = false; 
+            if (this.humActive) {
+                this.humActive = false;
                 this.hoverGain.gain.cancelScheduledValues(t);
                 this.hoverGain.gain.setValueAtTime(this.hoverGain.gain.value || 0, t);
-                this.hoverGain.gain.exponentialRampToValueAtTime(0.0001, t + 0.1); 
+                this.hoverGain.gain.exponentialRampToValueAtTime(0.0001, t + 0.1);
                 this.hoverGain.gain.setValueAtTime(0, t + 0.15);
-                this.hoverFilter.frequency.setTargetAtTime(100, t, 0.1); 
-                this.hoverOsc.frequency.setTargetAtTime(45, t, 0.1); 
+                this.hoverFilter.frequency.setTargetAtTime(100, t, 0.1);
+                this.hoverOsc.frequency.setTargetAtTime(45, t, 0.1);
             }
         }
     }
@@ -516,18 +563,18 @@ class UIChime {
     setFireMode(isActive) {
         if (!this.initialized) return;
         if (isActive && !this.fireWindNode) {
-            this.fireWindNode = this.ctx.createBufferSource(); 
-            this.fireWindNode.buffer = this.noiseBuffer; 
+            this.fireWindNode = this.ctx.createBufferSource();
+            this.fireWindNode.buffer = this.noiseBuffer;
             this.fireWindNode.loop = true;
 
             this.brownFilter = this.ctx.createBiquadFilter();
             this.brownFilter.type = 'lowpass';
-            this.brownFilter.frequency.value = 150; 
-            
+            this.brownFilter.frequency.value = 150;
+
             this.panL = this.ctx.createStereoPanner();
             this.panR = this.ctx.createStereoPanner();
             const haasDelay = this.ctx.createDelay();
-            haasDelay.delayTime.value = 0.015; 
+            haasDelay.delayTime.value = 0.015;
 
             this.fireWindGainL = this.ctx.createGain();
             this.fireWindGainR = this.ctx.createGain();
@@ -543,10 +590,10 @@ class UIChime {
 
             this.panL.connect(this.ctx.destination);
             this.panR.connect(this.ctx.destination);
-            
+
             this.fireWindNode.start();
-        } else if (!isActive && this.fireWindNode) { 
-            this.fireWindNode.stop(); this.fireWindNode.disconnect(); this.fireWindNode = null; 
+        } else if (!isActive && this.fireWindNode) {
+            this.fireWindNode.stop(); this.fireWindNode.disconnect(); this.fireWindNode = null;
             if (this.brownFilter) { this.brownFilter.disconnect(); this.brownFilter = null; }
             if (this.fireWindGainL) { this.fireWindGainL.disconnect(); this.fireWindGainL = null; }
             if (this.fireWindGainR) { this.fireWindGainR.disconnect(); this.fireWindGainR = null; }
@@ -556,32 +603,32 @@ class UIChime {
     setFireVelocity(vel, intensity = 50, isHovering = true) {
         if (!this.fireWindGainL || !this.fireWindGainR) return;
         const t = this.ctx.currentTime;
-        if (!isHovering && vel === 0) { 
+        if (!isHovering && vel === 0) {
             this.fireWindGainL.gain.cancelScheduledValues(t);
             this.fireWindGainL.gain.setValueAtTime(this.fireWindGainL.gain.value || 0, t);
-            this.fireWindGainL.gain.exponentialRampToValueAtTime(0.0001, t + 0.05); 
+            this.fireWindGainL.gain.exponentialRampToValueAtTime(0.0001, t + 0.05);
             this.fireWindGainL.gain.setValueAtTime(0, t + 0.05);
-            
+
             this.fireWindGainR.gain.cancelScheduledValues(t);
             this.fireWindGainR.gain.setValueAtTime(this.fireWindGainR.gain.value || 0, t);
-            this.fireWindGainR.gain.exponentialRampToValueAtTime(0.0001, t + 0.05); 
+            this.fireWindGainR.gain.exponentialRampToValueAtTime(0.0001, t + 0.05);
             this.fireWindGainR.gain.setValueAtTime(0, t + 0.05);
-            return; 
+            return;
         }
-        
+
         let iFactor = intensity / 100;
-        
-        let spread = iFactor; 
-        if(this.panL && this.panR) {
+
+        let spread = iFactor;
+        if (this.panL && this.panR) {
             this.panL.pan.setTargetAtTime(-spread, t, 0.1);
             this.panR.pan.setTargetAtTime(spread, t, 0.1);
         }
 
-        const targetFreq = 100 + (iFactor * 300) + Math.min(vel * 5, 100); 
+        const targetFreq = 100 + (iFactor * 300) + Math.min(vel * 5, 100);
         const targetGain = (iFactor * 0.16) + Math.min(vel * 0.004, 0.08);
-        
-        if(this.brownFilter) this.brownFilter.frequency.setTargetAtTime(targetFreq, t, 0.1); 
-        
+
+        if (this.brownFilter) this.brownFilter.frequency.setTargetAtTime(targetFreq, t, 0.1);
+
         this.fireWindGainL.gain.setTargetAtTime(targetGain, t, 0.1);
         this.fireWindGainR.gain.setTargetAtTime(targetGain, t, 0.1);
     }
@@ -591,33 +638,33 @@ class UIChime {
         const t = this.ctx.currentTime; const dur = 0.06 + Math.random() * 0.15; const bufferSize = this.ctx.sampleRate * dur;
         const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate); const data = buffer.getChannelData(0);
         for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
-        
+
         let iFactor = intensity / 100;
-        
+
         const noise = this.ctx.createBufferSource(); noise.buffer = buffer;
-        const filter = this.ctx.createBiquadFilter(); filter.type = 'bandpass'; 
-        filter.frequency.value = 300 + Math.random() * 400; 
+        const filter = this.ctx.createBiquadFilter(); filter.type = 'bandpass';
+        filter.frequency.value = 300 + Math.random() * 400;
         filter.Q.value = 0.8 + (1 - iFactor);
-        
-        const gain = this.ctx.createGain(); gain.gain.setValueAtTime(0, t); 
-        gain.gain.linearRampToValueAtTime((0.02 + iFactor * 0.05) + Math.random() * 0.02, t + 0.02); 
+
+        const gain = this.ctx.createGain(); gain.gain.setValueAtTime(0, t);
+        gain.gain.linearRampToValueAtTime((0.02 + iFactor * 0.05) + Math.random() * 0.02, t + 0.02);
         gain.gain.exponentialRampToValueAtTime(0.001, t + dur * 1.5);
-        
+
         noise.connect(filter); filter.connect(gain); gain.connect(this.ctx.destination); noise.start(t);
     }
-    
+
     playForward() {
         if (this.ctx.state === 'suspended') this.ctx.resume();
-        const t = this.ctx.currentTime; const masterGain = this.ctx.createGain(); masterGain.connect(this.ctx.destination); masterGain.gain.setValueAtTime(0, t); masterGain.gain.linearRampToValueAtTime(0.6, t + 0.01); 
+        const t = this.ctx.currentTime; const masterGain = this.ctx.createGain(); masterGain.connect(this.ctx.destination); masterGain.gain.setValueAtTime(0, t); masterGain.gain.linearRampToValueAtTime(0.6, t + 0.01);
         const clickOsc = this.ctx.createOscillator(); const clickGain = this.ctx.createGain(); clickOsc.type = 'sine'; clickOsc.frequency.setValueAtTime(600, t); clickOsc.frequency.exponentialRampToValueAtTime(50, t + 0.02); clickGain.gain.setValueAtTime(0.5, t); clickGain.gain.exponentialRampToValueAtTime(0.001, t + 0.03); clickOsc.connect(clickGain); clickGain.connect(masterGain); clickOsc.start(t); clickOsc.stop(t + 0.04);
         const freqs = [92.50, 146.83, 220.00, 293.66];
         freqs.forEach((freq, index) => {
-            const osc = this.ctx.createOscillator(); const gain = this.ctx.createGain(); const startTime = t + (index * 0.03); 
+            const osc = this.ctx.createOscillator(); const gain = this.ctx.createGain(); const startTime = t + (index * 0.03);
             osc.type = index === 0 ? 'triangle' : 'sine'; osc.frequency.setValueAtTime(freq, startTime); osc.frequency.setValueAtTime(freq + 5, startTime); osc.frequency.exponentialRampToValueAtTime(freq, startTime + 0.15);
             gain.gain.setValueAtTime(0, startTime); gain.gain.linearRampToValueAtTime(index === 0 ? 0.6 : 0.3, startTime + 0.03); gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.8);
             osc.connect(gain); gain.connect(masterGain); osc.start(startTime); osc.stop(startTime + 0.9);
         });
-        const filter = this.ctx.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.setValueAtTime(600, t); filter.frequency.exponentialRampToValueAtTime(100, t + 0.8); 
+        const filter = this.ctx.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.setValueAtTime(600, t); filter.frequency.exponentialRampToValueAtTime(100, t + 0.8);
         const delay = this.ctx.createDelay(); delay.delayTime.value = 0.08; const feedback = this.ctx.createGain(); feedback.gain.value = 0.15;
         masterGain.connect(delay); delay.connect(filter); filter.connect(feedback); feedback.connect(delay); filter.connect(this.ctx.destination);
     }
@@ -640,9 +687,9 @@ class UIChime {
 
     playStepForward() {
         if (this.ctx.state === 'suspended') this.ctx.resume();
-        const t = this.ctx.currentTime; const masterGain = this.ctx.createGain(); masterGain.connect(this.ctx.destination); masterGain.gain.setValueAtTime(0, t); masterGain.gain.linearRampToValueAtTime(0.2, t + 0.005); 
+        const t = this.ctx.currentTime; const masterGain = this.ctx.createGain(); masterGain.connect(this.ctx.destination); masterGain.gain.setValueAtTime(0, t); masterGain.gain.linearRampToValueAtTime(0.2, t + 0.005);
         const osc1 = this.ctx.createOscillator(); const osc2 = this.ctx.createOscillator(); const gain1 = this.ctx.createGain(); const gain2 = this.ctx.createGain();
-        osc1.type = 'sine'; osc1.frequency.setValueAtTime(220.00, t); osc2.type = 'sine'; osc2.frequency.setValueAtTime(293.66, t + 0.02); 
+        osc1.type = 'sine'; osc1.frequency.setValueAtTime(220.00, t); osc2.type = 'sine'; osc2.frequency.setValueAtTime(293.66, t + 0.02);
         gain1.gain.setValueAtTime(0, t); gain1.gain.linearRampToValueAtTime(0.5, t + 0.01); gain1.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
         gain2.gain.setValueAtTime(0, t + 0.02); gain2.gain.linearRampToValueAtTime(0.5, t + 0.03); gain2.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
         const filter = this.ctx.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.setValueAtTime(1500, t); filter.frequency.exponentialRampToValueAtTime(400, t + 0.15);
@@ -654,7 +701,7 @@ class UIChime {
         if (this.ctx.state === 'suspended') this.ctx.resume();
         const t = this.ctx.currentTime; const masterGain = this.ctx.createGain(); masterGain.connect(this.ctx.destination); masterGain.gain.setValueAtTime(0, t); masterGain.gain.linearRampToValueAtTime(0.2, t + 0.005);
         const osc1 = this.ctx.createOscillator(); const osc2 = this.ctx.createOscillator(); const gain1 = this.ctx.createGain(); const gain2 = this.ctx.createGain();
-        osc1.type = 'sine'; osc1.frequency.setValueAtTime(293.66, t); osc2.type = 'sine'; osc2.frequency.setValueAtTime(220.00, t + 0.02); 
+        osc1.type = 'sine'; osc1.frequency.setValueAtTime(293.66, t); osc2.type = 'sine'; osc2.frequency.setValueAtTime(220.00, t + 0.02);
         gain1.gain.setValueAtTime(0, t); gain1.gain.linearRampToValueAtTime(0.4, t + 0.01); gain1.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
         gain2.gain.setValueAtTime(0, t + 0.02); gain2.gain.linearRampToValueAtTime(0.4, t + 0.03); gain2.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
         const filter = this.ctx.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.setValueAtTime(800, t); filter.frequency.exponentialRampToValueAtTime(200, t + 0.15);
@@ -666,16 +713,16 @@ class UIChime {
         if (this.ctx.state === 'suspended') this.ctx.resume();
         const t = this.ctx.currentTime; const masterGain = this.ctx.createGain(); masterGain.connect(this.ctx.destination); masterGain.gain.setValueAtTime(0, t); masterGain.gain.linearRampToValueAtTime(0.4, t + 0.005);
         const clickOsc = this.ctx.createOscillator(); const clickGain = this.ctx.createGain(); clickOsc.type = 'sine'; clickOsc.frequency.setValueAtTime(isOn ? 400 : 200, t); clickOsc.frequency.exponentialRampToValueAtTime(50, t + 0.02); clickGain.gain.setValueAtTime(0.4, t); clickGain.gain.exponentialRampToValueAtTime(0.001, t + 0.03); clickOsc.connect(clickGain); clickGain.connect(masterGain); clickOsc.start(t); clickOsc.stop(t + 0.04);
-        const osc = this.ctx.createOscillator(); const osc2 = this.ctx.createOscillator(); const gain = this.ctx.createGain(); osc.type = 'triangle'; osc2.type = 'sine'; const baseFreq = 73.42; 
+        const osc = this.ctx.createOscillator(); const osc2 = this.ctx.createOscillator(); const gain = this.ctx.createGain(); osc.type = 'triangle'; osc2.type = 'sine'; const baseFreq = 73.42;
         if (isOn) {
             osc.frequency.setValueAtTime(baseFreq - 5, t); osc.frequency.exponentialRampToValueAtTime(baseFreq, t + 0.2); osc2.frequency.setValueAtTime((baseFreq * 2) - 5, t); osc2.frequency.exponentialRampToValueAtTime(baseFreq * 2, t + 0.2);
             gain.gain.setValueAtTime(0, t); gain.gain.linearRampToValueAtTime(0.6, t + 0.05); gain.gain.exponentialRampToValueAtTime(0.001, t + 1.5);
         } else {
             osc.frequency.setValueAtTime(baseFreq, t); osc.frequency.exponentialRampToValueAtTime(baseFreq - 15, t + 0.3); osc2.frequency.setValueAtTime(baseFreq * 2, t); osc2.frequency.exponentialRampToValueAtTime((baseFreq * 2) - 15, t + 0.3);
-            gain.gain.setValueAtTime(0, t); gain.gain.linearRampToValueAtTime(0.5, t + 0.02); gain.gain.exponentialRampToValueAtTime(0.001, t + 0.4); 
+            gain.gain.setValueAtTime(0, t); gain.gain.linearRampToValueAtTime(0.5, t + 0.02); gain.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
         }
         const filter = this.ctx.createBiquadFilter(); filter.type = 'lowpass';
-        if (isOn) { filter.frequency.setValueAtTime(200, t); filter.frequency.exponentialRampToValueAtTime(1000, t + 0.1); filter.frequency.exponentialRampToValueAtTime(150, t + 1.5); } 
+        if (isOn) { filter.frequency.setValueAtTime(200, t); filter.frequency.exponentialRampToValueAtTime(1000, t + 0.1); filter.frequency.exponentialRampToValueAtTime(150, t + 1.5); }
         else { filter.frequency.setValueAtTime(800, t); filter.frequency.exponentialRampToValueAtTime(80, t + 0.3); }
         const delay = this.ctx.createDelay(); delay.delayTime.value = 0.05; const feedback = this.ctx.createGain(); feedback.gain.value = 0.1;
         osc.connect(gain); osc2.connect(gain); gain.connect(filter); filter.connect(masterGain); filter.connect(delay); delay.connect(feedback); feedback.connect(delay); filter.connect(masterGain);
@@ -686,7 +733,7 @@ class UIChime {
 const uiSound = new UIChime();
 
 document.addEventListener("DOMContentLoaded", () => {
-    
+
     // --- MASTER MODE (ADMIN) ARCHITECTURE ---
     let isAdminMode = false;
     const btnAdminLogin = document.getElementById('btn-admin-login');
@@ -699,10 +746,10 @@ document.addEventListener("DOMContentLoaded", () => {
             if (code === "070121") {
                 isAdminMode = true;
                 btnAdminLogin.style.display = 'none';
-                if(btnAdminExit) btnAdminExit.style.display = 'block';
-                if(btnAdminSkipRpg) btnAdminSkipRpg.style.display = 'block';
-                document.body.classList.add('toc-active'); 
-                updateNextButton(); 
+                if (btnAdminExit) btnAdminExit.style.display = 'block';
+                if (btnAdminSkipRpg) btnAdminSkipRpg.style.display = 'block';
+                document.body.classList.add('toc-active');
+                updateNextButton();
                 alert("Master Mode Unlocked. You have full autonomous navigation.");
             } else if (code !== null) {
                 alert("Access Denied: Incorrect Passcode.");
@@ -713,11 +760,11 @@ document.addEventListener("DOMContentLoaded", () => {
     if (btnAdminExit) {
         btnAdminExit.addEventListener('click', () => {
             isAdminMode = false;
-            if(btnAdminLogin) btnAdminLogin.style.display = 'block';
+            if (btnAdminLogin) btnAdminLogin.style.display = 'block';
             btnAdminExit.style.display = 'none';
-            if(btnAdminSkipRpg) btnAdminSkipRpg.style.display = 'none';
+            if (btnAdminSkipRpg) btnAdminSkipRpg.style.display = 'none';
             const btnRestart = document.getElementById('btn-restart');
-            if(btnRestart) btnRestart.click(); 
+            if (btnRestart) btnRestart.click();
             alert("Master Mode Exited. Module reset to Associate view.");
         });
     }
@@ -734,71 +781,71 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     document.body.addEventListener('click', () => uiSound.init(), { once: true });
-    
+
     let currentGlobalSlide = 0;
-    const totalSlides = 10; 
+    const totalSlides = 10;
     const sliderWrapper = document.getElementById('slider-wrapper');
     const navPrev = document.getElementById('nav-prev');
     const navNext = document.getElementById('nav-next');
-    let slideCompletion = [true, false, false, false, false, false, true, true, false, true]; 
+    let slideCompletion = [true, false, false, false, false, false, true, true, false, true];
     window.slideControllers = {};
     let moduleCompleted = false;
 
     function goToSlide(index) {
-        if(index < 0 || index >= totalSlides) return;
-        
-        speechEngine.cancel(); 
-        
+        if (index < 0 || index >= totalSlides) return;
+
+        speechEngine.cancel();
+
         if (currentGlobalSlide === 9 && index !== 9) uiSound.stopCompletionTheme();
-        if (index === 9 && currentGlobalSlide !== 9) uiSound.playCompletionTheme(); 
-        else if (index < currentGlobalSlide) uiSound.playBackward(); 
+        if (index === 9 && currentGlobalSlide !== 9) uiSound.playCompletionTheme();
+        else if (index < currentGlobalSlide) uiSound.playBackward();
         else if (index > currentGlobalSlide) uiSound.playForward();
-        
-        if(window.slideControllers[currentGlobalSlide] && window.slideControllers[currentGlobalSlide].onLeave) {
+
+        if (window.slideControllers[currentGlobalSlide] && window.slideControllers[currentGlobalSlide].onLeave) {
             window.slideControllers[currentGlobalSlide].onLeave();
         }
 
         currentGlobalSlide = index;
         if (sliderWrapper) sliderWrapper.style.transform = `translateY(-${currentGlobalSlide * 100}vh)`;
 
-        if(currentGlobalSlide === 0) { 
-            if(navPrev) navPrev.classList.remove('visible'); 
-            if(navNext) { navNext.innerText = "Start Module ❯"; navNext.style.display = 'block'; }
-        } 
-        else if (currentGlobalSlide === 7 || currentGlobalSlide === 8 || currentGlobalSlide === 9) { 
-            if(navPrev) navPrev.classList.add('visible'); 
-            if(navNext) navNext.style.display = 'none'; 
-        } 
-        else { 
-            if(navPrev) navPrev.classList.add('visible'); 
-            if(navNext) { navNext.style.display = 'block'; navNext.innerText = "Continue ❯"; }
+        if (currentGlobalSlide === 0) {
+            if (navPrev) navPrev.classList.remove('visible');
+            if (navNext) { navNext.innerText = "Start Module ❯"; navNext.style.display = 'block'; }
+        }
+        else if (currentGlobalSlide === 7 || currentGlobalSlide === 8 || currentGlobalSlide === 9) {
+            if (navPrev) navPrev.classList.add('visible');
+            if (navNext) navNext.style.display = 'none';
+        }
+        else {
+            if (navPrev) navPrev.classList.add('visible');
+            if (navNext) { navNext.style.display = 'block'; navNext.innerText = "Continue ❯"; }
         }
         updateNextButton();
 
         document.querySelectorAll('.slide-container').forEach((el, i) => {
             const fades = el.querySelectorAll('.fade-element');
-            if(i === currentGlobalSlide) fades.forEach(f => f.classList.add('visible'));
+            if (i === currentGlobalSlide) fades.forEach(f => f.classList.add('visible'));
             else fades.forEach(f => f.classList.remove('visible'));
         });
 
         document.querySelectorAll('.toc-link').forEach(btn => btn.classList.remove('current'));
         const activeLink = document.querySelector(`.toc-link[data-target="${currentGlobalSlide}"]`);
-        if(activeLink) activeLink.classList.add('current');
+        if (activeLink) activeLink.classList.add('current');
 
         if (currentGlobalSlide === 9 && !moduleCompleted) {
             moduleCompleted = true;
-            setTimeout(() => { document.body.classList.add('toc-active'); }, 4500); 
+            setTimeout(() => { document.body.classList.add('toc-active'); }, 4500);
         }
 
-        if(window.slideControllers[currentGlobalSlide] && window.slideControllers[currentGlobalSlide].onEnter) {
+        if (window.slideControllers[currentGlobalSlide] && window.slideControllers[currentGlobalSlide].onEnter) {
             window.slideControllers[currentGlobalSlide].onEnter();
         }
     }
 
     function updateNextButton() {
-        if(currentGlobalSlide === 7 || currentGlobalSlide === 8 || currentGlobalSlide === 9) return; 
-        if(navNext) {
-            if(isAdminMode || slideCompletion[currentGlobalSlide]) navNext.classList.add('visible');
+        if (currentGlobalSlide === 7 || currentGlobalSlide === 8 || currentGlobalSlide === 9) return;
+        if (navNext) {
+            if (isAdminMode || slideCompletion[currentGlobalSlide]) navNext.classList.add('visible');
             else navNext.classList.remove('visible');
         }
     }
@@ -821,9 +868,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const startVirtualExpBtn = document.getElementById('btn-start-virtual-exp');
     if (startVirtualExpBtn) {
-        startVirtualExpBtn.addEventListener('click', () => { 
+        startVirtualExpBtn.addEventListener('click', () => {
             uiSound.playWarpSound();
-            goToSlide(8); 
+            goToSlide(8);
         });
     }
 
@@ -841,12 +888,12 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     document.querySelectorAll('.toc-link').forEach(btn => {
-        btn.addEventListener('click', (e) => { 
+        btn.addEventListener('click', (e) => {
             let targetIndex = parseInt(e.currentTarget.getAttribute('data-target'));
-            if(window.slideControllers[targetIndex] && window.slideControllers[targetIndex].reset) {
+            if (window.slideControllers[targetIndex] && window.slideControllers[targetIndex].reset) {
                 window.slideControllers[targetIndex].reset();
             }
-            goToSlide(targetIndex); 
+            goToSlide(targetIndex);
         });
     });
 
@@ -856,16 +903,16 @@ document.addEventListener("DOMContentLoaded", () => {
             speechEngine.cancel(); uiSound.stopCompletionTheme(); uiSound.playBackward();
             document.body.classList.remove('toc-active'); moduleCompleted = false;
             slideCompletion = [true, false, false, false, false, false, true, true, false, true];
-            hasCompletedOneScenario = false; 
+            hasCompletedOneScenario = false;
             const persistentFinishBtn = document.getElementById('btn-persistent-finish');
             if (persistentFinishBtn) persistentFinishBtn.style.display = 'none';
-            for(let key in window.slideControllers) { 
-                if (window.slideControllers[key].hardReset) window.slideControllers[key].hardReset(); 
-                if (window.slideControllers[key].reset) window.slideControllers[key].reset(); 
+            for (let key in window.slideControllers) {
+                if (window.slideControllers[key].hardReset) window.slideControllers[key].hardReset();
+                if (window.slideControllers[key].reset) window.slideControllers[key].reset();
             }
             activeScenarioPool = [...masterScenarioBank]; scoreKept = 0; scoreReturned = 0;
             const keptEl = document.getElementById('score-kept');
-            if (keptEl) keptEl.innerText = "0"; 
+            if (keptEl) keptEl.innerText = "0";
             const returnedEl = document.getElementById('score-returned');
             if (returnedEl) returnedEl.innerText = "0";
             initRPG(); goToSlide(0);
@@ -873,25 +920,25 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function initSequenceController(slideIndex, textIds, svgIds, btnPrevId, btnNextId, stepCountId, mode) {
-        let currentStep = 0; 
-        const texts = textIds.map(id => document.getElementById(id)).filter(el => el !== null); 
-        const svgs = svgIds.map(id => document.getElementById(id)).filter(el => el !== null); 
-        const totalSteps = texts.length; 
-        let lockTimer = null; let hasWaited = false; let isActive = false;  
+        let currentStep = 0;
+        const texts = textIds.map(id => document.getElementById(id)).filter(el => el !== null);
+        const svgs = svgIds.map(id => document.getElementById(id)).filter(el => el !== null);
+        const totalSteps = texts.length;
+        let lockTimer = null; let hasWaited = false; let isActive = false;
         const btnPrev = document.getElementById(btnPrevId); const btnNext = document.getElementById(btnNextId); const stepCount = document.getElementById(stepCountId); const anchor = svgs[0] ? svgs[0].parentElement : null;
 
         const updateStep = () => {
             if (lockTimer) { clearInterval(lockTimer); lockTimer = null; }
             for (let i = 0; i < texts.length; i++) {
-                if (currentStep === totalSteps || currentStep === i) { texts[i].style.opacity = '1'; svgs[i].style.opacity = '1'; svgs[i].style.pointerEvents = 'auto'; } 
+                if (currentStep === totalSteps || currentStep === i) { texts[i].style.opacity = '1'; svgs[i].style.opacity = '1'; svgs[i].style.pointerEvents = 'auto'; }
                 else { texts[i].style.opacity = '0.2'; svgs[i].style.opacity = '0'; svgs[i].style.pointerEvents = 'none'; }
             }
             if (mode === 'stack' && anchor) {
                 if (currentStep === totalSteps) anchor.classList.add('stack-active');
                 else anchor.classList.remove('stack-active');
             }
-            if(stepCount) stepCount.innerText = `${currentStep + 1} / ${totalSteps + 1}`;
-            
+            if (stepCount) stepCount.innerText = `${currentStep + 1} / ${totalSteps + 1}`;
+
             if (audioEnabled && isActive) {
                 let slideText = currentStep === totalSteps ? texts[0].innerText : (texts[currentStep] ? texts[currentStep].innerText : "");
                 if (slideText) playSpeech(slideText);
@@ -899,34 +946,34 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const qledGraphic = document.getElementById('qled-layer-graphic');
             if (slideIndex === 3 && qledGraphic) {
-                if (currentStep === 0 && isActive) { if (!qledGraphic.classList.contains('play-anim')) { void qledGraphic.offsetWidth; qledGraphic.classList.add('play-anim'); } } 
+                if (currentStep === 0 && isActive) { if (!qledGraphic.classList.contains('play-anim')) { void qledGraphic.offsetWidth; qledGraphic.classList.add('play-anim'); } }
                 else { qledGraphic.classList.remove('play-anim'); }
             }
             if (slideIndex === 3 && currentStep === 0 && !hasWaited && isActive) {
                 if (isAdminMode) {
                     if (btnNext) { btnNext.disabled = false; btnNext.innerText = "Examine ❯"; btnNext.classList.remove('replay-mode'); }
-                    if (btnPrev) btnPrev.disabled = true; 
+                    if (btnPrev) btnPrev.disabled = true;
                     hasWaited = true; updateNextButton();
                 } else {
                     if (btnNext) { btnNext.disabled = true; btnNext.classList.remove('replay-mode'); btnNext.innerText = `Animating (10s)`; }
-                    if (btnPrev) btnPrev.disabled = true; 
-                    let timeLeft = 10; 
+                    if (btnPrev) btnPrev.disabled = true;
+                    let timeLeft = 10;
                     lockTimer = setInterval(() => {
                         timeLeft--;
-                        if (timeLeft > 0) { if (btnNext) btnNext.innerText = `Animating (${timeLeft}s)`; } 
-                        else { 
-                            clearInterval(lockTimer); lockTimer = null; hasWaited = true; 
-                            if (currentStep === 0 && btnNext) { btnNext.disabled = false; btnNext.innerText = "Examine ❯"; btnNext.classList.remove('replay-mode'); } 
-                            updateNextButton(); 
+                        if (timeLeft > 0) { if (btnNext) btnNext.innerText = `Animating (${timeLeft}s)`; }
+                        else {
+                            clearInterval(lockTimer); lockTimer = null; hasWaited = true;
+                            if (currentStep === 0 && btnNext) { btnNext.disabled = false; btnNext.innerText = "Examine ❯"; btnNext.classList.remove('replay-mode'); }
+                            updateNextButton();
                         }
                     }, 1000);
                 }
-            } else { 
-                if(btnPrev) {
-                    btnPrev.disabled = currentStep === 0; 
+            } else {
+                if (btnPrev) {
+                    btnPrev.disabled = currentStep === 0;
                     btnPrev.innerText = "❮ Review";
                 }
-                if(btnNext) {
+                if (btnNext) {
                     if (currentStep === totalSteps) {
                         btnNext.disabled = false;
                         btnNext.innerText = "Replay ↺";
@@ -938,39 +985,39 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
                 }
             }
-            if(currentStep === totalSteps) { slideCompletion[slideIndex] = true; updateNextButton(); }
+            if (currentStep === totalSteps) { slideCompletion[slideIndex] = true; updateNextButton(); }
         };
 
         const triggerNext = () => { if (btnNext && !btnNext.disabled && currentStep < totalSteps) { currentStep++; updateStep(); return true; } return false; };
         const triggerPrev = () => { if (btnPrev && !btnPrev.disabled && currentStep > 0) { currentStep--; updateStep(); return true; } return false; };
         const replaySequence = () => { currentStep = 0; updateStep(); };
 
-        if(btnPrev) btnPrev.addEventListener('click', () => { if (triggerPrev()) uiSound.playStepBackward(); });
-        if(btnNext) btnNext.addEventListener('click', () => { 
+        if (btnPrev) btnPrev.addEventListener('click', () => { if (triggerPrev()) uiSound.playStepBackward(); });
+        if (btnNext) btnNext.addEventListener('click', () => {
             if (currentStep === totalSteps) {
                 replaySequence();
                 uiSound.playBackward();
             } else {
-                if (triggerNext()) uiSound.playStepForward(); 
+                if (triggerNext()) uiSound.playStepForward();
             }
         });
-        
+
         window.slideControllers[slideIndex] = {
             onEnter: () => { isActive = true; updateStep(); },
-            onLeave: () => { 
-                isActive = false; 
-                if (lockTimer) { clearInterval(lockTimer); lockTimer = null; } 
-                const qledGraphic = document.getElementById('qled-layer-graphic'); 
-                if (slideIndex === 3 && qledGraphic) qledGraphic.classList.remove('play-anim'); 
+            onLeave: () => {
+                isActive = false;
+                if (lockTimer) { clearInterval(lockTimer); lockTimer = null; }
+                const qledGraphic = document.getElementById('qled-layer-graphic');
+                if (slideIndex === 3 && qledGraphic) qledGraphic.classList.remove('play-anim');
                 if (slideIndex === 4 && uiSound.killCanvasAudio) uiSound.killCanvasAudio();
             },
-            reset: () => { 
-                if (lockTimer) clearInterval(lockTimer); currentStep = 0; 
-                if (slideIndex === 5) { 
-                    const ghostGroup = document.getElementById('burn-in-ghost'); const scanLine = document.getElementById('oled-scanner'); const btnProtect = document.getElementById('btn-protect'); 
-                    if (ghostGroup && btnProtect) { ghostGroup.style.opacity = '0.6'; btnProtect.innerText = "Run Pixel Refresher"; btnProtect.disabled = false; isCleaned = false; } 
-                    if (scanLine) scanLine.classList.remove('run-scan'); 
-                } 
+            reset: () => {
+                if (lockTimer) clearInterval(lockTimer); currentStep = 0;
+                if (slideIndex === 5) {
+                    const ghostGroup = document.getElementById('burn-in-ghost'); const scanLine = document.getElementById('oled-scanner'); const btnProtect = document.getElementById('btn-protect');
+                    if (ghostGroup && btnProtect) { ghostGroup.style.opacity = '0.6'; btnProtect.innerText = "Run Pixel Refresher"; btnProtect.disabled = false; isCleaned = false; }
+                    if (scanLine) scanLine.classList.remove('run-scan');
+                }
             },
             hardReset: () => { hasWaited = false; },
             nextStep: triggerNext,
@@ -984,143 +1031,143 @@ document.addEventListener("DOMContentLoaded", () => {
     initSequenceController(4, ['text-base-4', 'text-limit-4', 'text-color-4', 'text-best-4'], ['svg-base-4', 'svg-limit-4', 'svg-color-4', 'svg-best-4'], 'btn-prev-4', 'btn-next-4', 'step-count-4', 'stack');
     initSequenceController(5, ['text-base-5', 'text-limit-5', 'text-burn-5', 'text-best-5'], ['svg-base-5', 'svg-limit-5', 'svg-burn-5', 'svg-best-5'], 'btn-prev-5', 'btn-next-5', 'step-count-5', 'stack');
 
-    window.slideControllers[6] = { onEnter: () => { slideCompletion[6] = true; updateNextButton(); }, onLeave: () => {}, reset: () => {}, hardReset: () => {}, nextStep: () => false, prevStep: () => false };
-    window.slideControllers[7] = { onEnter: () => { slideCompletion[7] = true; updateNextButton(); }, onLeave: () => {}, reset: () => {}, hardReset: () => {}, nextStep: () => false, prevStep: () => false };
+    window.slideControllers[6] = { onEnter: () => { slideCompletion[6] = true; updateNextButton(); }, onLeave: () => { }, reset: () => { }, hardReset: () => { }, nextStep: () => false, prevStep: () => false };
+    window.slideControllers[7] = { onEnter: () => { slideCompletion[7] = true; updateNextButton(); }, onLeave: () => { }, reset: () => { }, hardReset: () => { }, nextStep: () => false, prevStep: () => false };
 
     const raySvg = document.getElementById('interactive-qd-ray'); const qdContainer = document.getElementById('qd-array-container'); const userBeam = document.getElementById('user-beam'); const userLedGroup = document.getElementById('user-led-group'); const userLed = document.getElementById('user-led'); const userLedBack = document.getElementById('user-led-back'); const ledLabelText = document.getElementById('led-label-text'); const toggleLedBtn = document.getElementById('toggle-led-btn');
     let ledIsOn = false; let currentMouseX = 40; let currentMouseY = 120; const qd_dots = []; const dotYPositions = [35, 50, 65, 80, 95, 110, 125, 140, 155, 170, 185, 200];
-    
+
     if (qdContainer) {
-        dotYPositions.forEach(y => { 
+        dotYPositions.forEach(y => {
             const dotGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
             const dotHalo = document.createElementNS('http://www.w3.org/2000/svg', 'circle'); dotHalo.setAttribute('cx', '120'); dotHalo.setAttribute('cy', y); dotHalo.setAttribute('r', '8'); dotHalo.setAttribute('fill', 'var(--qd-color)'); dotHalo.setAttribute('opacity', '0'); dotHalo.setAttribute('filter', 'url(#premium-bloom)');
-            const dotCore = document.createElementNS('http://www.w3.org/2000/svg', 'circle'); dotCore.setAttribute('cx', '120'); dotCore.setAttribute('cy', y); dotCore.setAttribute('r', '4'); dotCore.setAttribute('fill', '#333'); dotCore.setAttribute('stroke', '#222'); dotCore.setAttribute('stroke-width', '1'); 
+            const dotCore = document.createElementNS('http://www.w3.org/2000/svg', 'circle'); dotCore.setAttribute('cx', '120'); dotCore.setAttribute('cy', y); dotCore.setAttribute('r', '4'); dotCore.setAttribute('fill', '#333'); dotCore.setAttribute('stroke', '#222'); dotCore.setAttribute('stroke-width', '1');
             dotGroup.appendChild(dotHalo); dotGroup.appendChild(dotCore);
             const rayR = document.createElementNS('http://www.w3.org/2000/svg', 'polygon'); rayR.setAttribute('points', `125,${y} 240,${y - 25} 240,${y - 5}`); rayR.setAttribute('fill', 'url(#fade-R)'); rayR.setAttribute('opacity', '0'); rayR.style.mixBlendMode = 'screen';
             const rayG = document.createElementNS('http://www.w3.org/2000/svg', 'polygon'); rayG.setAttribute('points', `125,${y} 240,${y - 10} 240,${y + 10}`); rayG.setAttribute('fill', 'url(#fade-G)'); rayG.setAttribute('opacity', '0'); rayG.style.mixBlendMode = 'screen';
             const rayB = document.createElementNS('http://www.w3.org/2000/svg', 'polygon'); rayB.setAttribute('points', `125,${y} 240,${y + 5} 240,${y + 25}`); rayB.setAttribute('fill', 'url(#fade-B)'); rayB.setAttribute('opacity', '0'); rayB.style.mixBlendMode = 'screen';
-            qdContainer.appendChild(rayR); qdContainer.appendChild(rayG); qdContainer.appendChild(rayB); qdContainer.appendChild(dotGroup); qd_dots.push({ y, dotCore, dotHalo, rays: [rayR, rayG, rayB] }); 
+            qdContainer.appendChild(rayR); qdContainer.appendChild(rayG); qdContainer.appendChild(rayB); qdContainer.appendChild(dotGroup); qd_dots.push({ y, dotCore, dotHalo, rays: [rayR, rayG, rayB] });
         });
     }
 
-    function updateBeamPhysics() { 
-        if (!ledIsOn) { 
-            if (userBeam) userBeam.setAttribute('opacity', '0'); 
-            if (userLedGroup) userLedGroup.setAttribute('opacity', '0.3'); 
-            if (userLed) userLed.setAttribute('fill', '#555'); 
-            qd_dots.forEach(d => { d.dotCore.setAttribute('fill', '#333'); d.dotHalo.setAttribute('opacity', '0'); d.rays.forEach(r => r.setAttribute('opacity', '0')); }); 
-            return; 
-        } 
-        if (userLedGroup) userLedGroup.setAttribute('opacity', '1'); 
-        if (userLed) userLed.setAttribute('fill', '#fff'); 
-        if (userBeam) userBeam.setAttribute('opacity', '1'); 
-        let distance = 120 - currentMouseX; let spreadRadius = 5 + (distance * 0.45); 
-        if (userBeam) userBeam.setAttribute('points', `${currentMouseX},${currentMouseY} 120,${currentMouseY - spreadRadius} 120,${currentMouseY + spreadRadius}`); 
-        qd_dots.forEach(d => { 
+    function updateBeamPhysics() {
+        if (!ledIsOn) {
+            if (userBeam) userBeam.setAttribute('opacity', '0');
+            if (userLedGroup) userLedGroup.setAttribute('opacity', '0.3');
+            if (userLed) userLed.setAttribute('fill', '#555');
+            qd_dots.forEach(d => { d.dotCore.setAttribute('fill', '#333'); d.dotHalo.setAttribute('opacity', '0'); d.rays.forEach(r => r.setAttribute('opacity', '0')); });
+            return;
+        }
+        if (userLedGroup) userLedGroup.setAttribute('opacity', '1');
+        if (userLed) userLed.setAttribute('fill', '#fff');
+        if (userBeam) userBeam.setAttribute('opacity', '1');
+        let distance = 120 - currentMouseX; let spreadRadius = 5 + (distance * 0.45);
+        if (userBeam) userBeam.setAttribute('points', `${currentMouseX},${currentMouseY} 120,${currentMouseY - spreadRadius} 120,${currentMouseY + spreadRadius}`);
+        qd_dots.forEach(d => {
             let distToCenter = Math.abs(d.y - currentMouseY);
-            if (distToCenter <= spreadRadius) { 
+            if (distToCenter <= spreadRadius) {
                 let intensity = Math.pow(1 - (distToCenter / spreadRadius), 0.5);
-                d.dotCore.setAttribute('fill', '#ffffff'); d.dotHalo.setAttribute('opacity', intensity.toString()); d.rays.forEach(r => r.setAttribute('opacity', (intensity * 0.9).toString())); 
-            } else { 
-                d.dotCore.setAttribute('fill', '#333'); d.dotHalo.setAttribute('opacity', '0'); d.rays.forEach(r => r.setAttribute('opacity', '0')); 
-            } 
-        }); 
+                d.dotCore.setAttribute('fill', '#ffffff'); d.dotHalo.setAttribute('opacity', intensity.toString()); d.rays.forEach(r => r.setAttribute('opacity', (intensity * 0.9).toString()));
+            } else {
+                d.dotCore.setAttribute('fill', '#333'); d.dotHalo.setAttribute('opacity', '0'); d.rays.forEach(r => r.setAttribute('opacity', '0'));
+            }
+        });
     }
 
-    if (toggleLedBtn) { 
-        toggleLedBtn.addEventListener('click', () => { 
-            ledIsOn = !ledIsOn; 
-            uiSound.playToggleState(ledIsOn); 
-            toggleLedBtn.classList.toggle('active', ledIsOn); 
-            toggleLedBtn.innerText = ledIsOn ? "Turn OFF LED" : "Turn ON LED"; 
-            updateBeamPhysics(); 
-        }); 
+    if (toggleLedBtn) {
+        toggleLedBtn.addEventListener('click', () => {
+            ledIsOn = !ledIsOn;
+            uiSound.playToggleState(ledIsOn);
+            toggleLedBtn.classList.toggle('active', ledIsOn);
+            toggleLedBtn.innerText = ledIsOn ? "Turn OFF LED" : "Turn ON LED";
+            updateBeamPhysics();
+        });
     }
 
-    if (raySvg) { 
-        raySvg.addEventListener('mousemove', (e) => { 
-            const rect = e.currentTarget.getBoundingClientRect(); 
-            const mouseX = (e.clientX - rect.left) * (240 / rect.width); 
-            const mouseY = (e.clientY - rect.top) * (240 / rect.height); 
-            if (mouseX > 115) return; 
-            currentMouseX = Math.max(5, Math.min(mouseX, 110)); 
-            currentMouseY = Math.max(15, Math.min(mouseY, 225)); 
-            if (userLedBack) userLedBack.setAttribute('x', currentMouseX - 5); 
-            if (userLedBack) userLedBack.setAttribute('y', currentMouseY - 5); 
-            if (userLed) userLed.setAttribute('cx', currentMouseX); 
-            if (userLed) userLed.setAttribute('cy', currentMouseY); 
-            if (ledLabelText) ledLabelText.setAttribute('x', currentMouseX < 35 ? 35 : currentMouseX); 
-            if (ledLabelText) ledLabelText.setAttribute('y', currentMouseY - 15); 
-            updateBeamPhysics(); 
-        }); 
+    if (raySvg) {
+        raySvg.addEventListener('mousemove', (e) => {
+            const rect = e.currentTarget.getBoundingClientRect();
+            const mouseX = (e.clientX - rect.left) * (240 / rect.width);
+            const mouseY = (e.clientY - rect.top) * (240 / rect.height);
+            if (mouseX > 115) return;
+            currentMouseX = Math.max(5, Math.min(mouseX, 110));
+            currentMouseY = Math.max(15, Math.min(mouseY, 225));
+            if (userLedBack) userLedBack.setAttribute('x', currentMouseX - 5);
+            if (userLedBack) userLedBack.setAttribute('y', currentMouseY - 5);
+            if (userLed) userLed.setAttribute('cx', currentMouseX);
+            if (userLed) userLed.setAttribute('cy', currentMouseY);
+            if (ledLabelText) ledLabelText.setAttribute('x', currentMouseX < 35 ? 35 : currentMouseX);
+            if (ledLabelText) ledLabelText.setAttribute('y', currentMouseY - 15);
+            updateBeamPhysics();
+        });
     }
-    
+
     const revealCanvas = document.getElementById('reveal-canvas'); const lensClip = document.getElementById('lens-circle-clip'); const lensRing = document.getElementById('lens-ring');
-    if (revealCanvas && lensClip && lensRing) { 
-        revealCanvas.addEventListener('mousemove', (e) => { 
-            const rect = revealCanvas.getBoundingClientRect(); 
-            const mouseX = (e.clientX - rect.left) * (240 / rect.width); 
-            const mouseY = (e.clientY - rect.top) * (240 / rect.height); 
-            lensClip.setAttribute('cx', mouseX); lensClip.setAttribute('cy', mouseY); 
-            lensRing.setAttribute('cx', mouseX); lensRing.setAttribute('cy', mouseY); 
-        }); 
-        revealCanvas.addEventListener('mouseleave', () => { 
-            lensClip.setAttribute('cx', 120); lensClip.setAttribute('cy', 120); 
-            lensRing.setAttribute('cx', 120); lensRing.setAttribute('cy', 120); 
-        }); 
+    if (revealCanvas && lensClip && lensRing) {
+        revealCanvas.addEventListener('mousemove', (e) => {
+            const rect = revealCanvas.getBoundingClientRect();
+            const mouseX = (e.clientX - rect.left) * (240 / rect.width);
+            const mouseY = (e.clientY - rect.top) * (240 / rect.height);
+            lensClip.setAttribute('cx', mouseX); lensClip.setAttribute('cy', mouseY);
+            lensRing.setAttribute('cx', mouseX); lensRing.setAttribute('cy', mouseY);
+        });
+        revealCanvas.addEventListener('mouseleave', () => {
+            lensClip.setAttribute('cx', 120); lensClip.setAttribute('cy', 120);
+            lensRing.setAttribute('cx', 120); lensRing.setAttribute('cy', 120);
+        });
     }
-    
-    const zoneSlider = document.getElementById('zone-slider'); const canvas = document.getElementById('mini-led-canvas'); const ctx = canvas ? canvas.getContext('2d', { alpha: false }) : null; 
+
+    const zoneSlider = document.getElementById('zone-slider'); const canvas = document.getElementById('mini-led-canvas'); const ctx = canvas ? canvas.getContext('2d', { alpha: false }) : null;
     const modeCursorBtn = document.getElementById('mode-cursor'); const modeFireBtn = document.getElementById('mode-fire');
     const modeSpaceBtn = document.getElementById('mode-space');
     const fireIntensityWrapper = document.getElementById('fire-intensity-wrapper');
     const fireIntensitySlider = document.getElementById('fire-intensity-slider');
     const udlCaption = document.getElementById('udl-fire-caption');
-    
+
     let m_gridSize = 20; let m_lightRadius = 150; let m_mouseX = -1000; let m_mouseY = -1000; let m_isHovering = false; let activeSprite = 'cursor'; let hoverTimeout; let lastMouseX = -1000; let lastMouseY = -1000; let smoothedVel = 0; let particles = []; let fireParticles = []; let spaceParticles = []; let shockwaves = []; let pulsars = []; let trail = [];
     let m_fireIntensity = 50; let m_isCharging = false; let m_chargeLevel = 0; let m_hypernovaFlash = 0;
-    let m_implosionStage = 0; 
+    let m_implosionStage = 0;
     let m_implosionFrames = 0; let m_implosionX = 0; let m_implosionY = 0;
 
     if (fireIntensitySlider) {
         fireIntensitySlider.addEventListener('input', (e) => {
             m_fireIntensity = parseInt(e.target.value);
-            if(m_fireIntensity < 30) fireIntensitySlider.style.accentColor = '#007aff';
-            else if(m_fireIntensity < 70) fireIntensitySlider.style.accentColor = '#FFD60A';
+            if (m_fireIntensity < 30) fireIntensitySlider.style.accentColor = '#007aff';
+            else if (m_fireIntensity < 70) fireIntensitySlider.style.accentColor = '#FFD60A';
             else fireIntensitySlider.style.accentColor = '#ff3b30';
         });
     }
 
     if (modeCursorBtn && modeFireBtn && modeSpaceBtn) {
-        modeCursorBtn.addEventListener('click', () => { 
+        modeCursorBtn.addEventListener('click', () => {
             uiSound.killCanvasAudio();
-            uiSound.playStepBackward(); activeSprite = 'cursor'; 
+            uiSound.playStepBackward(); activeSprite = 'cursor';
             modeCursorBtn.classList.add('active'); modeFireBtn.classList.remove('active'); modeSpaceBtn.classList.remove('active');
             uiSound.setFireMode(false); fireParticles = []; spaceParticles = []; shockwaves = []; pulsars = []; m_isCharging = false; m_hypernovaFlash = 0; m_implosionStage = 0;
-            if(fireIntensityWrapper) fireIntensityWrapper.style.display = 'none';
-            if(udlCaption) {
+            if (fireIntensityWrapper) fireIntensityWrapper.style.display = 'none';
+            if (udlCaption) {
                 udlCaption.style.color = '#666';
                 udlCaption.innerHTML = "<strong>Light Beam:</strong> Hover over the grid to observe standard backlight tracking.";
             }
         });
-        modeFireBtn.addEventListener('click', () => { 
+        modeFireBtn.addEventListener('click', () => {
             uiSound.killCanvasAudio();
-            uiSound.playStepForward(); activeSprite = 'fire'; 
+            uiSound.playStepForward(); activeSprite = 'fire';
             modeFireBtn.classList.add('active'); modeCursorBtn.classList.remove('active'); modeSpaceBtn.classList.remove('active');
             uiSound.setFireMode(true); trail = []; spaceParticles = []; shockwaves = []; pulsars = []; m_isCharging = false; m_hypernovaFlash = 0; m_implosionStage = 0;
-            if(fireIntensityWrapper) fireIntensityWrapper.style.display = 'flex';
-            if(udlCaption) {
+            if (fireIntensityWrapper) fireIntensityWrapper.style.display = 'flex';
+            if (udlCaption) {
                 udlCaption.style.color = '#666';
                 udlCaption.innerHTML = "<strong>Grid Fire:</strong> Hover over the grid to observe local dimming physics.";
             }
         });
         modeSpaceBtn.addEventListener('click', () => {
             uiSound.killCanvasAudio();
-            uiSound.playStepForward(); activeSprite = 'space'; 
+            uiSound.playStepForward(); activeSprite = 'space';
             modeSpaceBtn.classList.add('active'); modeCursorBtn.classList.remove('active'); modeFireBtn.classList.remove('active');
             uiSound.setFireMode(false); fireParticles = []; trail = []; shockwaves = []; pulsars = []; m_isCharging = false; m_chargeLevel = 0; m_hypernovaFlash = 0; m_implosionStage = 0;
-            if(fireIntensityWrapper) fireIntensityWrapper.style.display = 'none';
-            if(udlCaption) {
+            if (fireIntensityWrapper) fireIntensityWrapper.style.display = 'none';
+            if (udlCaption) {
                 udlCaption.style.color = '#666';
                 udlCaption.innerHTML = "<strong>Deep Space:</strong> CLICK: Star &nbsp;•&nbsp; HOLD 1s: Supernova &nbsp;•&nbsp; HOLD 3s: Hypernova. Watch how dimming zones isolate absolute black.";
             }
@@ -1135,26 +1182,26 @@ document.addEventListener("DOMContentLoaded", () => {
             spaceParticles.push({
                 x: x, y: y,
                 vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
-                life: 1.0, maxLife: 1.0, 
+                life: 1.0, maxLife: 1.0,
                 decay: type === 2 ? (0.01 + Math.random() * 0.02) * 0.5 : (0.01 + Math.random() * 0.02),
                 size: Math.random() * 3 + 1,
                 type: type
             });
         }
-        
-        if (type === 1) { 
+
+        if (type === 1) {
             shockwaves.push({
                 x: x, y: y, z: -200, r: 0,
-                speed: 18, 
+                speed: 18,
                 zSpeed: 15,
                 power: 1.0,
                 type: 1
             });
-            pulsars.push({ x: x, y: y, life: 1.0 }); 
-        } else if (type === 2) { 
+            pulsars.push({ x: x, y: y, life: 1.0 });
+        } else if (type === 2) {
             shockwaves.push({
                 x: x, y: y, z: -300, r: 0,
-                speed: 8, 
+                speed: 8,
                 zSpeed: 8,
                 power: 2.0,
                 type: 2
@@ -1162,30 +1209,30 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    function drawGrid() { 
-        if (!ctx) return; 
-        const w = canvas.width; const h = canvas.height; ctx.globalCompositeOperation = 'source-over'; ctx.fillStyle = '#000000'; ctx.fillRect(0, 0, w, h); 
+    function drawGrid() {
+        if (!ctx) return;
+        const w = canvas.width; const h = canvas.height; ctx.globalCompositeOperation = 'source-over'; ctx.fillStyle = '#000000'; ctx.fillRect(0, 0, w, h);
         smoothedVel *= 0.9;
-        
+
         if (activeSprite === 'fire') uiSound.setFireVelocity(m_isHovering ? smoothedVel : 0, m_fireIntensity, m_isHovering);
         else if (activeSprite === 'cursor') uiSound.setHoverVelocity(m_isHovering ? smoothedVel : 0);
-        
-        const cw = w / m_gridSize; const ch = h / m_gridSize; const gap = 2; 
+
+        const cw = w / m_gridSize; const ch = h / m_gridSize; const gap = 2;
         let gridIntensity = Array(m_gridSize).fill().map(() => Array(m_gridSize).fill(0)); let gridColors = Array(m_gridSize).fill().map(() => Array(m_gridSize).fill('#ffffff'));
 
         if (activeSprite === 'cursor' && m_isHovering) {
-            if (trail.length !== 40) { trail = []; for (let i = 0; i < 40; i++) trail.push({x: m_mouseX, y: m_mouseY}); }
+            if (trail.length !== 40) { trail = []; for (let i = 0; i < 40; i++) trail.push({ x: m_mouseX, y: m_mouseY }); }
             trail[0].x = m_mouseX; trail[0].y = m_mouseY;
-            for (let i = 1; i < trail.length; i++) { trail[i].x += (trail[i-1].x - trail[i].x) * 0.4; trail[i].y += (trail[i-1].y - trail[i].y) * 0.4; }
-            for (let row = 0; row < m_gridSize; row++) { 
-                for (let col = 0; col < m_gridSize; col++) { 
+            for (let i = 1; i < trail.length; i++) { trail[i].x += (trail[i - 1].x - trail[i].x) * 0.4; trail[i].y += (trail[i - 1].y - trail[i].y) * 0.4; }
+            for (let row = 0; row < m_gridSize; row++) {
+                for (let col = 0; col < m_gridSize; col++) {
                     const cx = (col * cw) + (cw / 2); const cy = (row * ch) + (ch / 2); let distToHead = Math.hypot(m_mouseX - cx, m_mouseY - cy); let bloomRadius = m_lightRadius * 1.4;
-                    if (distToHead <= m_lightRadius) { gridIntensity[row][col] = 1; gridColors[row][col] = '#66fcf1'; } 
+                    if (distToHead <= m_lightRadius) { gridIntensity[row][col] = 1; gridColors[row][col] = '#66fcf1'; }
                     else if (distToHead <= bloomRadius) { let bloomIntensity = Math.pow(1 - ((distToHead - m_lightRadius) / (bloomRadius - m_lightRadius)), 2) * 0.4; gridIntensity[row][col] = bloomIntensity; gridColors[row][col] = `rgba(102, 252, 241, ${bloomIntensity})`; }
                     let maxTrailIntensity = 0;
                     for (let i = 0; i < trail.length; i += 2) { let td = Math.hypot(trail[i].x - cx, trail[i].y - cy); let ratio = 1 - (i / trail.length); let trailRad = m_lightRadius * Math.pow(ratio, 0.7); if (td <= trailRad && ratio > maxTrailIntensity) maxTrailIntensity = ratio; }
                     if (maxTrailIntensity > gridIntensity[row][col]) { gridIntensity[row][col] = maxTrailIntensity; gridColors[row][col] = `rgba(220, 255, 255, ${maxTrailIntensity})`; }
-                } 
+                }
             }
         }
 
@@ -1208,54 +1255,54 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             }
 
-            if (m_isHovering) { 
+            if (m_isHovering) {
                 let spawnCount = 2 + Math.floor(iFactor * 6);
                 let spreadBase = m_lightRadius * 0.4;
                 let spreadAdd = m_lightRadius * iFactor * 1.5;
-                let finalSpread = Math.min(spreadBase + spreadAdd, 250); 
+                let finalSpread = Math.min(spreadBase + spreadAdd, 250);
 
-                for (let i = 0; i < spawnCount; i++) { 
+                for (let i = 0; i < spawnCount; i++) {
                     let p_vx = (Math.random() - 0.5) * (4 + iFactor * 10);
-                    let p_vy = -(Math.random() * (8 + iFactor * 15) + 3 + (iFactor * 5)); 
-                    let startLife = 0.6 + (iFactor * 0.8); 
-                    
-                    fireParticles.push({ 
-                        x: m_mouseX + (Math.random() - 0.5) * finalSpread, 
-                        y: m_mouseY + (Math.random() - 0.5) * (m_lightRadius * 0.4), 
-                        vx: p_vx, 
-                        vy: p_vy, 
+                    let p_vy = -(Math.random() * (8 + iFactor * 15) + 3 + (iFactor * 5));
+                    let startLife = 0.6 + (iFactor * 0.8);
+
+                    fireParticles.push({
+                        x: m_mouseX + (Math.random() - 0.5) * finalSpread,
+                        y: m_mouseY + (Math.random() - 0.5) * (m_lightRadius * 0.4),
+                        vx: p_vx,
+                        vy: p_vy,
                         life: startLife,
                         maxLife: startLife,
                         intens: iFactor
-                    }); 
-                } 
-                
+                    });
+                }
+
                 while (fireParticles.length > 300) { fireParticles.shift(); }
             }
             for (let i = fireParticles.length - 1; i >= 0; i--) {
-                let p = fireParticles[i]; 
-                
+                let p = fireParticles[i];
+
                 let nextY = p.y + p.vy;
-                if (nextY <= 0) { 
-                    p.y = 0; 
-                    p.vy = -p.vy * 0.1; 
-                    p.vx *= 2.5; 
+                if (nextY <= 0) {
+                    p.y = 0;
+                    p.vy = -p.vy * 0.1;
+                    p.vx *= 2.5;
                 } else {
                     p.y += p.vy;
                 }
-                
-                p.x += p.vx; 
-                
+
+                p.x += p.vx;
+
                 if (p.x < 0) { p.x = 0; p.vx *= -0.5; }
                 if (p.x > w) { p.x = w; p.vx *= -0.5; }
 
                 p.life -= 0.035;
 
-                if (p.life <= 0) { fireParticles.splice(i, 1); } 
+                if (p.life <= 0) { fireParticles.splice(i, 1); }
                 else {
                     const col = Math.floor(p.x / cw); const row = Math.floor(p.y / ch);
-                    if (col >= 0 && col < m_gridSize && row >= 0 && row < m_gridSize) { 
-                        gridIntensity[row][col] = 1; 
+                    if (col >= 0 && col < m_gridSize && row >= 0 && row < m_gridSize) {
+                        gridIntensity[row][col] = 1;
                         let pRatio = p.life / p.maxLife;
                         let colorStr = '#ffffff';
                         if (p.intens < 0.3) {
@@ -1265,22 +1312,22 @@ document.addEventListener("DOMContentLoaded", () => {
                         } else {
                             colorStr = pRatio > 0.8 ? '#ffffff' : (pRatio > 0.5 ? '#FFD60A' : (pRatio > 0.2 ? '#FF3B30' : '#880000'));
                         }
-                        gridColors[row][col] = colorStr; 
+                        gridColors[row][col] = colorStr;
                     }
-                    
-                    let bloomIntensity = p.life * 0.4 * (0.5 + p.intens * 0.5); 
-                    if (bloomIntensity > 0.05) { 
-                        const neighbors = [[-1, -1], [0, -1], [1, -1], [-1, 0], [1, 0], [-1, 1], [0, 1], [1, 1]]; 
-                        neighbors.forEach(n => { 
-                            let c = col + n[0]; let r = row + n[1]; 
-                            if (c >= 0 && c < m_gridSize && r >= 0 && r < m_gridSize && gridIntensity[r][c] < 1 && bloomIntensity > gridIntensity[r][c]) { 
-                                gridIntensity[r][c] = bloomIntensity; 
+
+                    let bloomIntensity = p.life * 0.4 * (0.5 + p.intens * 0.5);
+                    if (bloomIntensity > 0.05) {
+                        const neighbors = [[-1, -1], [0, -1], [1, -1], [-1, 0], [1, 0], [-1, 1], [0, 1], [1, 1]];
+                        neighbors.forEach(n => {
+                            let c = col + n[0]; let r = row + n[1];
+                            if (c >= 0 && c < m_gridSize && r >= 0 && r < m_gridSize && gridIntensity[r][c] < 1 && bloomIntensity > gridIntensity[r][c]) {
+                                gridIntensity[r][c] = bloomIntensity;
                                 let haloColor = 'rgba(255, 59, 48, ';
                                 if (p.intens < 0.3) haloColor = 'rgba(0, 122, 255, ';
                                 else if (p.intens > 0.7) haloColor = 'rgba(255, 214, 10, ';
-                                gridColors[r][c] = `${haloColor}${bloomIntensity})`; 
-                            } 
-                        }); 
+                                gridColors[r][c] = `${haloColor}${bloomIntensity})`;
+                            }
+                        });
                     }
                 }
             }
@@ -1289,9 +1336,9 @@ document.addEventListener("DOMContentLoaded", () => {
         if (activeSprite === 'space') {
             for (let i = pulsars.length - 1; i >= 0; i--) {
                 let p = pulsars[i];
-                p.life -= 0.005; 
+                p.life -= 0.005;
                 if (p.life <= 0) { pulsars.splice(i, 1); continue; }
-                
+
                 const col = Math.floor(p.x / cw); const row = Math.floor(p.y / ch);
                 if (col >= 0 && col < m_gridSize && row >= 0 && row < m_gridSize) {
                     gridIntensity[row][col] = p.life;
@@ -1301,28 +1348,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (m_implosionStage > 0) {
                 m_implosionFrames--;
-                
+
                 if (m_implosionStage === 2) {
-                    m_chargeLevel *= 0.4; 
-                    ctx.beginPath(); ctx.arc(m_implosionX, m_implosionY, m_chargeLevel * 150, 0, Math.PI * 2); 
-                    ctx.fillStyle = `rgba(0, 0, 0, 1.0)`; 
+                    m_chargeLevel *= 0.4;
+                    ctx.beginPath(); ctx.arc(m_implosionX, m_implosionY, m_chargeLevel * 150, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(0, 0, 0, 1.0)`;
                     ctx.fill();
-                    
+
                     if (m_implosionFrames <= 0) {
                         m_implosionStage = 0; m_chargeLevel = 0;
                         m_hypernovaFlash = 1.2;
-                        createStarburst(m_implosionX, m_implosionY, 2.0, 2); 
+                        createStarburst(m_implosionX, m_implosionY, 2.0, 2);
                     }
                 } else if (m_implosionStage === 1) {
-                    m_chargeLevel *= 0.75; 
-                    ctx.beginPath(); ctx.arc(m_implosionX, m_implosionY, m_chargeLevel * 150, 0, Math.PI * 2); 
-                    ctx.fillStyle = `rgba(0, 0, 0, 1.0)`; 
+                    m_chargeLevel *= 0.75;
+                    ctx.beginPath(); ctx.arc(m_implosionX, m_implosionY, m_chargeLevel * 150, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(0, 0, 0, 1.0)`;
                     ctx.fill();
 
                     if (m_implosionFrames <= 0) {
                         m_implosionStage = 0; m_chargeLevel = 0;
                         uiSound.releaseSupernova();
-                        createStarburst(m_implosionX, m_implosionY, 1.0, 1); 
+                        createStarburst(m_implosionX, m_implosionY, 1.0, 1);
                     }
                 }
             }
@@ -1331,22 +1378,22 @@ document.addEventListener("DOMContentLoaded", () => {
                 let sw = shockwaves[i];
                 sw.r += sw.speed;
                 sw.z += sw.zSpeed;
-                sw.speed *= 0.95; 
-                sw.power -= 0.02; 
+                sw.speed *= 0.95;
+                sw.power -= 0.02;
                 if (sw.power <= 0) { shockwaves.splice(i, 1); continue; }
 
                 for (let row = 0; row < m_gridSize; row++) {
                     for (let col = 0; col < m_gridSize; col++) {
                         const cx = (col * cw) + (cw / 2); const cy = (row * ch) + (ch / 2);
                         let dist2D = Math.hypot(sw.x - cx, sw.y - cy);
-                        
+
                         let sphereR2 = sw.r * sw.r;
                         let currentZ2 = sw.z * sw.z;
-                        
+
                         if (sphereR2 > currentZ2) {
                             let sliceRadius = Math.sqrt(sphereR2 - currentZ2);
-                            let shellThickness = sw.type === 2 ? 60 + (sw.power * 80) : 30 + (sw.power * 40); 
-                            
+                            let shellThickness = sw.type === 2 ? 60 + (sw.power * 80) : 30 + (sw.power * 40);
+
                             if (dist2D < sliceRadius) {
                                 let intensity = 0;
                                 if (dist2D > sliceRadius - shellThickness) {
@@ -1354,16 +1401,16 @@ document.addEventListener("DOMContentLoaded", () => {
                                 } else if (sw.z < 0 && dist2D < sliceRadius) {
                                     intensity = sw.power * 1.5;
                                 }
-                                
+
                                 intensity = Math.min(1.0, Math.max(0, intensity));
-                                
+
                                 if (intensity > gridIntensity[row][col]) {
                                     gridIntensity[row][col] = intensity;
                                     let swColor;
                                     if (sw.type === 2) {
-                                        swColor = intensity > 0.85 ? '#ffffff' : (intensity > 0.6 ? '#4facfe' : '#0055ff'); 
+                                        swColor = intensity > 0.85 ? '#ffffff' : (intensity > 0.6 ? '#4facfe' : '#0055ff');
                                     } else {
-                                        swColor = intensity > 0.8 ? '#ffffff' : (intensity > 0.5 ? '#e879f9' : '#a855f7'); 
+                                        swColor = intensity > 0.8 ? '#ffffff' : (intensity > 0.5 ? '#e879f9' : '#a855f7');
                                     }
                                     gridColors[row][col] = swColor;
                                 }
@@ -1375,20 +1422,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
             let jx = m_mouseX; let jy = m_mouseY;
             if (m_isCharging && m_implosionStage === 0) {
-                m_chargeLevel = Math.min(m_chargeLevel + 0.015, 3.5); 
+                m_chargeLevel = Math.min(m_chargeLevel + 0.015, 3.5);
                 uiSound.updateSupernovaCharge(m_chargeLevel);
 
                 if (m_chargeLevel >= 3.3) {
-                    let coreRadius = 150 * 0.3; 
+                    let coreRadius = 150 * 0.3;
                     let pulse = Math.abs(Math.sin(performance.now() * 0.02));
                     let armedRadius = coreRadius + (pulse * 15);
-                    
+
                     jx += (Math.random() - 0.5) * 30;
                     jy += (Math.random() - 0.5) * 30;
 
-                    for (let row = 0; row < m_gridSize; row++) { 
+                    for (let row = 0; row < m_gridSize; row++) {
                         for (let col = 0; col < m_gridSize; col++) {
-                            const cx = (col * cw) + (cw / 2); const cy = (row * ch) + (ch / 2); 
+                            const cx = (col * cw) + (cw / 2); const cy = (row * ch) + (ch / 2);
                             let dist = Math.hypot(jx - cx, jy - cy);
                             if (dist <= armedRadius) {
                                 gridIntensity[row][col] = 1.0;
@@ -1397,16 +1444,16 @@ document.addEventListener("DOMContentLoaded", () => {
                         }
                     }
                 } else if (m_chargeLevel >= 3.15) {
-                    let collapseProgress = (m_chargeLevel - 3.15) / 0.15; 
-                    let coreRadius = 150 - (collapseProgress * 105); 
-                    
+                    let collapseProgress = (m_chargeLevel - 3.15) / 0.15;
+                    let coreRadius = 150 - (collapseProgress * 105);
+
                     let jitterAmount = collapseProgress * 30;
                     jx += (Math.random() - 0.5) * jitterAmount;
                     jy += (Math.random() - 0.5) * jitterAmount;
 
-                    for (let row = 0; row < m_gridSize; row++) { 
+                    for (let row = 0; row < m_gridSize; row++) {
                         for (let col = 0; col < m_gridSize; col++) {
-                            const cx = (col * cw) + (cw / 2); const cy = (row * ch) + (ch / 2); 
+                            const cx = (col * cw) + (cw / 2); const cy = (row * ch) + (ch / 2);
                             let dist = Math.hypot(jx - cx, jy - cy);
                             if (dist <= coreRadius) {
                                 gridIntensity[row][col] = 1.0;
@@ -1419,7 +1466,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                 let falloff = Math.pow(1 - ((dist - coreRadius) / (coreRadius * 0.5)), 2);
                                 if (falloff > gridIntensity[row][col]) {
                                     gridIntensity[row][col] = falloff;
-                                    gridColors[row][col] = `rgba(168, 85, 247, ${falloff})`; 
+                                    gridColors[row][col] = `rgba(168, 85, 247, ${falloff})`;
                                 }
                             }
                         }
@@ -1427,7 +1474,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 } else if (m_chargeLevel >= 3.0) {
                     // ABSOLUTE DARKNESS VOID
                 } else {
-                    let visualCharge = Math.min(m_chargeLevel, 1.0); 
+                    let visualCharge = Math.min(m_chargeLevel, 1.0);
                     let coreRadius = visualCharge * 150;
 
                     if (m_chargeLevel > 1.0) {
@@ -1436,9 +1483,9 @@ document.addEventListener("DOMContentLoaded", () => {
                         jy += (Math.random() - 0.5) * jitterAmount;
                     }
 
-                    for (let row = 0; row < m_gridSize; row++) { 
+                    for (let row = 0; row < m_gridSize; row++) {
                         for (let col = 0; col < m_gridSize; col++) {
-                            const cx = (col * cw) + (cw / 2); const cy = (row * ch) + (ch / 2); 
+                            const cx = (col * cw) + (cw / 2); const cy = (row * ch) + (ch / 2);
                             let dist = Math.hypot(jx - cx, jy - cy);
                             if (dist <= coreRadius) {
                                 gridIntensity[row][col] = 1.0;
@@ -1447,7 +1494,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                 let falloff = Math.pow(1 - ((dist - coreRadius) / (coreRadius * 0.5)), 2);
                                 if (falloff > gridIntensity[row][col]) {
                                     gridIntensity[row][col] = falloff;
-                                    gridColors[row][col] = `rgba(168, 85, 247, ${falloff})`; 
+                                    gridColors[row][col] = `rgba(168, 85, 247, ${falloff})`;
                                 }
                             }
                         }
@@ -1457,7 +1504,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (m_hypernovaFlash > 0) {
                 m_hypernovaFlash -= 0.02;
-                for (let row = 0; row < m_gridSize; row++) { 
+                for (let row = 0; row < m_gridSize; row++) {
                     for (let col = 0; col < m_gridSize; col++) {
                         if (m_hypernovaFlash > gridIntensity[row][col]) {
                             gridIntensity[row][col] = m_hypernovaFlash;
@@ -1468,48 +1515,48 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             for (let i = spaceParticles.length - 1; i >= 0; i--) {
-                let p = spaceParticles[i]; 
-                
+                let p = spaceParticles[i];
+
                 if (p.type === 2 && p.life < p.maxLife * 0.5) {
                     p.vx *= 0.92;
                     p.vy *= 0.92;
                 }
-                
+
                 p.x += p.vx; p.y += p.vy; p.life -= p.decay;
-                
-                if (p.life <= 0) { spaceParticles.splice(i, 1); } 
+
+                if (p.life <= 0) { spaceParticles.splice(i, 1); }
                 else {
                     const col = Math.floor(p.x / cw); const row = Math.floor(p.y / ch);
                     if (col >= 0 && col < m_gridSize && row >= 0 && row < m_gridSize) {
                         let pRatio = p.life / p.maxLife;
                         let sColor;
-                        
-                        if (p.type === 2) { 
-                            if (pRatio > 0.85) sColor = '#ffffff'; 
-                            else if (pRatio > 0.7) sColor = '#4facfe'; 
-                            else if (pRatio > 0.5) sColor = '#0055ff'; 
-                            else if (pRatio > 0.25) sColor = Math.random() > 0.5 ? '#a855f7' : '#e879f9'; 
-                            else sColor = '#ff2a6d'; 
-                        } else { 
-                            if (pRatio > 0.8) sColor = '#ffffff'; 
-                            else if (pRatio > 0.5) sColor = '#e879f9'; 
-                            else if (pRatio > 0.2) sColor = '#c084fc'; 
-                            else if (pRatio > 0.1) sColor = '#ff2a6d'; 
-                            else sColor = '#ff3b30'; 
+
+                        if (p.type === 2) {
+                            if (pRatio > 0.85) sColor = '#ffffff';
+                            else if (pRatio > 0.7) sColor = '#4facfe';
+                            else if (pRatio > 0.5) sColor = '#0055ff';
+                            else if (pRatio > 0.25) sColor = Math.random() > 0.5 ? '#a855f7' : '#e879f9';
+                            else sColor = '#ff2a6d';
+                        } else {
+                            if (pRatio > 0.8) sColor = '#ffffff';
+                            else if (pRatio > 0.5) sColor = '#e879f9';
+                            else if (pRatio > 0.2) sColor = '#c084fc';
+                            else if (pRatio > 0.1) sColor = '#ff2a6d';
+                            else sColor = '#ff3b30';
                         }
-                        
+
                         gridIntensity[row][col] = Math.max(gridIntensity[row][col], p.life);
                         gridColors[row][col] = sColor;
-                        
+
                         let bloomIntensity = p.life * 0.5;
                         if (bloomIntensity > 0.1) {
-                            const neighbors = [[-1, -1], [0, -1], [1, -1], [-1, 0], [1, 0], [-1, 1], [0, 1], [1, 1]]; 
-                            neighbors.forEach(n => { 
-                                let c = col + n[0]; let r = row + n[1]; 
-                                if (c >= 0 && c < m_gridSize && r >= 0 && r < m_gridSize && gridIntensity[r][c] < 1) { 
-                                    gridIntensity[r][c] = Math.max(gridIntensity[r][c], bloomIntensity); 
-                                    gridColors[r][c] = `rgba(255, 255, 255, ${bloomIntensity * 0.5})`; 
-                                } 
+                            const neighbors = [[-1, -1], [0, -1], [1, -1], [-1, 0], [1, 0], [-1, 1], [0, 1], [1, 1]];
+                            neighbors.forEach(n => {
+                                let c = col + n[0]; let r = row + n[1];
+                                if (c >= 0 && c < m_gridSize && r >= 0 && r < m_gridSize && gridIntensity[r][c] < 1) {
+                                    gridIntensity[r][c] = Math.max(gridIntensity[r][c], bloomIntensity);
+                                    gridColors[r][c] = `rgba(255, 255, 255, ${bloomIntensity * 0.5})`;
+                                }
                             });
                         }
                     }
@@ -1517,22 +1564,22 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
 
-        ctx.globalCompositeOperation = 'source-over'; ctx.lineWidth = 2; 
-        for (let row = 0; row < m_gridSize; row++) { 
-            for (let col = 0; col < m_gridSize; col++) { 
-                const x = col * cw; const y = row * ch; 
-                if (gridIntensity[row][col] > 0) { 
-                    ctx.fillStyle = gridColors[row][col]; ctx.fillRect(x + gap, y + gap, cw - gap * 2, ch - gap * 2); 
-                } 
-                else { ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)'; ctx.strokeRect(x + gap, y + gap, cw - gap * 2, ch - gap * 2); } 
-            } 
-        } 
+        ctx.globalCompositeOperation = 'source-over'; ctx.lineWidth = 2;
+        for (let row = 0; row < m_gridSize; row++) {
+            for (let col = 0; col < m_gridSize; col++) {
+                const x = col * cw; const y = row * ch;
+                if (gridIntensity[row][col] > 0) {
+                    ctx.fillStyle = gridColors[row][col]; ctx.fillRect(x + gap, y + gap, cw - gap * 2, ch - gap * 2);
+                }
+                else { ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)'; ctx.strokeRect(x + gap, y + gap, cw - gap * 2, ch - gap * 2); }
+            }
+        }
 
         if (m_implosionStage === 1) {
             ctx.globalCompositeOperation = 'source-over';
-            ctx.beginPath(); 
-            ctx.arc(m_implosionX, m_implosionY, m_chargeLevel * 150, 0, Math.PI * 2); 
-            ctx.fillStyle = `rgba(0, 0, 0, 1.0)`; 
+            ctx.beginPath();
+            ctx.arc(m_implosionX, m_implosionY, m_chargeLevel * 150, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(0, 0, 0, 1.0)`;
             ctx.fill();
         }
 
@@ -1540,39 +1587,39 @@ document.addEventListener("DOMContentLoaded", () => {
             if (m_isHovering) { const gradient = ctx.createRadialGradient(m_mouseX, m_mouseY, 0, m_mouseX, m_mouseY, m_lightRadius * 1.5); gradient.addColorStop(0, 'rgba(102, 252, 241, 0.1)'); gradient.addColorStop(1, 'rgba(102, 252, 241, 0)'); ctx.fillStyle = gradient; ctx.fillRect(0, 0, w, h); }
             for (let i = particles.length - 1; i >= 0; i--) { let p = particles[i]; p.x += p.vx; p.y += p.vy; p.life -= 0.015; if (p.life <= 0) { particles.splice(i, 1); } else { ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fillStyle = `rgba(102, 252, 241, ${p.life})`; ctx.fill(); } }
         }
-        
-        if (activeSprite === 'fire' && m_isHovering) { 
+
+        if (activeSprite === 'fire' && m_isHovering) {
             let iFactor = m_fireIntensity / 100;
-            if (Math.random() < 0.005 + (iFactor * 0.04) + (smoothedVel * 0.002)) uiSound.playCrackle(m_fireIntensity); 
+            if (Math.random() < 0.005 + (iFactor * 0.04) + (smoothedVel * 0.002)) uiSound.playCrackle(m_fireIntensity);
         }
-        
-        requestAnimationFrame(drawGrid); 
+
+        requestAnimationFrame(drawGrid);
     }
 
-    if(zoneSlider){ zoneSlider.addEventListener('input', (e) => { const val = parseInt(e.target.value); if (val === 1) { m_gridSize = 10; m_lightRadius = 250; } else if (val === 2) { m_gridSize = 20; m_lightRadius = 150; } else if (val === 3) { m_gridSize = 40; m_lightRadius = 80; } }); }
-    if(canvas){ 
-        
+    if (zoneSlider) { zoneSlider.addEventListener('input', (e) => { const val = parseInt(e.target.value); if (val === 1) { m_gridSize = 10; m_lightRadius = 250; } else if (val === 2) { m_gridSize = 20; m_lightRadius = 150; } else if (val === 3) { m_gridSize = 40; m_lightRadius = 80; } }); }
+    if (canvas) {
+
         function handleTouchMove(e) {
-            if(e.touches.length > 0) {
-                e.preventDefault(); 
-                m_isHovering = true; 
-                uiSound.setHoverState(true, activeSprite); 
-                clearTimeout(hoverTimeout); 
+            if (e.touches.length > 0) {
+                e.preventDefault();
+                m_isHovering = true;
+                uiSound.setHoverState(true, activeSprite);
+                clearTimeout(hoverTimeout);
                 hoverTimeout = setTimeout(() => { uiSound.setHoverState(false, activeSprite); smoothedVel = 0; }, 100);
-                
+
                 const rect = canvas.getBoundingClientRect();
                 m_mouseX = ((e.touches[0].clientX - rect.left) / rect.width) * 1000;
                 m_mouseY = ((e.touches[0].clientY - rect.top) / rect.height) * 1000;
-                
-                let dx = m_mouseX - lastMouseX; let dy = m_mouseY - lastMouseY; 
-                let currentVel = Math.sqrt(dx*dx + dy*dy); 
-                smoothedVel = smoothedVel * 0.8 + currentVel * 0.2; 
+
+                let dx = m_mouseX - lastMouseX; let dy = m_mouseY - lastMouseY;
+                let currentVel = Math.sqrt(dx * dx + dy * dy);
+                smoothedVel = smoothedVel * 0.8 + currentVel * 0.2;
                 lastMouseX = m_mouseX; lastMouseY = m_mouseY;
 
-                if (activeSprite === 'cursor') { 
-                    for (let i = 0; i < 4; i++) { 
-                        particles.push({ x: m_mouseX + (Math.random() - 0.5) * 40, y: m_mouseY + (Math.random() - 0.5) * 40, vx: (Math.random() - 0.5) * 4, vy: (Math.random() - 0.5) * 4 - 2, life: 1.0, size: Math.random() * 5 + 2 }); 
-                    } 
+                if (activeSprite === 'cursor') {
+                    for (let i = 0; i < 4; i++) {
+                        particles.push({ x: m_mouseX + (Math.random() - 0.5) * 40, y: m_mouseY + (Math.random() - 0.5) * 40, vx: (Math.random() - 0.5) * 4, vy: (Math.random() - 0.5) * 4 - 2, life: 1.0, size: Math.random() * 5 + 2 });
+                    }
                 }
             }
         }
@@ -1583,26 +1630,26 @@ document.addEventListener("DOMContentLoaded", () => {
                 uiSound.startSupernovaCharge();
             }
             handleTouchMove(e);
-        }, {passive: false});
+        }, { passive: false });
 
-        canvas.addEventListener('touchmove', handleTouchMove, {passive: false});
+        canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
 
         canvas.addEventListener('touchend', (e) => {
-            m_isHovering = false; trail = []; uiSound.setHoverState(false, activeSprite); smoothedVel = 0; uiSound.setFireVelocity(0); uiSound.setHoverVelocity(0); 
-            
+            m_isHovering = false; trail = []; uiSound.setHoverState(false, activeSprite); smoothedVel = 0; uiSound.setFireVelocity(0); uiSound.setHoverVelocity(0);
+
             if (activeSprite === 'space' && m_isCharging) {
                 m_isCharging = false;
                 if (m_chargeLevel >= 3.3) {
-                    m_implosionStage = 2; 
-                    m_implosionFrames = 8; 
+                    m_implosionStage = 2;
+                    m_implosionFrames = 8;
                     m_implosionX = m_mouseX; m_implosionY = m_mouseY;
-                    m_chargeLevel = 4.0; 
-                    uiSound.releaseHypernova(); 
+                    m_chargeLevel = 4.0;
+                    uiSound.releaseHypernova();
                 } else if (m_chargeLevel > 0.45) {
-                    m_implosionStage = 1; 
-                    m_implosionFrames = 18; 
+                    m_implosionStage = 1;
+                    m_implosionFrames = 18;
                     m_implosionX = m_mouseX; m_implosionY = m_mouseY;
-                    uiSound.startSuperSnap(); 
+                    uiSound.startSuperSnap();
                 } else {
                     uiSound.playStarDrop();
                     createStarburst(m_mouseX, m_mouseY, 0.1, 0);
@@ -1610,31 +1657,31 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             } else {
                 m_isCharging = false;
-                if(m_chargeLevel > 0 && m_implosionStage === 0) { 
-                    uiSound.releaseSupernova(); 
-                    m_chargeLevel = 0; 
+                if (m_chargeLevel > 0 && m_implosionStage === 0) {
+                    uiSound.releaseSupernova();
+                    m_chargeLevel = 0;
                 }
             }
         });
 
-        canvas.addEventListener('mousemove', (e) => { 
+        canvas.addEventListener('mousemove', (e) => {
             m_isHovering = true; uiSound.setHoverState(true, activeSprite); clearTimeout(hoverTimeout); hoverTimeout = setTimeout(() => { uiSound.setHoverState(false, activeSprite); smoothedVel = 0; }, 100);
-            const rect = canvas.getBoundingClientRect(); m_mouseX = ((e.clientX - rect.left) / rect.width) * 1000; m_mouseY = ((e.clientY - rect.top) / rect.height) * 1000; 
-            let dx = m_mouseX - lastMouseX; let dy = m_mouseY - lastMouseY; let currentVel = Math.sqrt(dx*dx + dy*dy); smoothedVel = smoothedVel * 0.8 + currentVel * 0.2; lastMouseX = m_mouseX; lastMouseY = m_mouseY;
+            const rect = canvas.getBoundingClientRect(); m_mouseX = ((e.clientX - rect.left) / rect.width) * 1000; m_mouseY = ((e.clientY - rect.top) / rect.height) * 1000;
+            let dx = m_mouseX - lastMouseX; let dy = m_mouseY - lastMouseY; let currentVel = Math.sqrt(dx * dx + dy * dy); smoothedVel = smoothedVel * 0.8 + currentVel * 0.2; lastMouseX = m_mouseX; lastMouseY = m_mouseY;
             if (activeSprite === 'cursor') { for (let i = 0; i < 4; i++) { particles.push({ x: m_mouseX + (Math.random() - 0.5) * 40, y: m_mouseY + (Math.random() - 0.5) * 40, vx: (Math.random() - 0.5) * 4, vy: (Math.random() - 0.5) * 4 - 2, life: 1.0, size: Math.random() * 5 + 2 }); } }
-        }); 
-        canvas.addEventListener('mouseleave', () => { m_isHovering = false; trail = []; uiSound.setHoverState(false, activeSprite); smoothedVel = 0; uiSound.setFireVelocity(0); uiSound.setHoverVelocity(0); m_isCharging = false; if(m_chargeLevel > 0 && m_implosionStage === 0) { uiSound.releaseSupernova(); m_chargeLevel = 0; } }); 
-        
+        });
+        canvas.addEventListener('mouseleave', () => { m_isHovering = false; trail = []; uiSound.setHoverState(false, activeSprite); smoothedVel = 0; uiSound.setFireVelocity(0); uiSound.setHoverVelocity(0); m_isCharging = false; if (m_chargeLevel > 0 && m_implosionStage === 0) { uiSound.releaseSupernova(); m_chargeLevel = 0; } });
+
         canvas.addEventListener('wheel', (e) => {
             if (activeSprite === 'fire') {
                 e.preventDefault();
-                m_fireIntensity -= Math.sign(e.deltaY) * 5; 
+                m_fireIntensity -= Math.sign(e.deltaY) * 5;
                 m_fireIntensity = Math.max(0, Math.min(100, m_fireIntensity));
-                
-                if(fireIntensitySlider) {
+
+                if (fireIntensitySlider) {
                     fireIntensitySlider.value = m_fireIntensity;
-                    if(m_fireIntensity < 30) fireIntensitySlider.style.accentColor = '#007aff';
-                    else if(m_fireIntensity < 70) fireIntensitySlider.style.accentColor = '#FFD60A';
+                    if (m_fireIntensity < 30) fireIntensitySlider.style.accentColor = '#007aff';
+                    else if (m_fireIntensity < 70) fireIntensitySlider.style.accentColor = '#FFD60A';
                     else fireIntensitySlider.style.accentColor = '#ff3b30';
                 }
             }
@@ -1651,16 +1698,16 @@ document.addEventListener("DOMContentLoaded", () => {
             if (activeSprite === 'space' && m_implosionStage === 0) {
                 m_isCharging = false;
                 if (m_chargeLevel >= 3.3) {
-                    m_implosionStage = 2; 
-                    m_implosionFrames = 8; 
+                    m_implosionStage = 2;
+                    m_implosionFrames = 8;
                     m_implosionX = m_mouseX; m_implosionY = m_mouseY;
-                    m_chargeLevel = 4.0; 
-                    uiSound.releaseHypernova(); 
+                    m_chargeLevel = 4.0;
+                    uiSound.releaseHypernova();
                 } else if (m_chargeLevel > 0.45) {
-                    m_implosionStage = 1; 
-                    m_implosionFrames = 18; 
+                    m_implosionStage = 1;
+                    m_implosionFrames = 18;
                     m_implosionX = m_mouseX; m_implosionY = m_mouseY;
-                    uiSound.startSuperSnap(); 
+                    uiSound.startSuperSnap();
                 } else {
                     uiSound.playStarDrop();
                     createStarburst(m_mouseX, m_mouseY, 0.1, 0);
@@ -1668,18 +1715,18 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             }
         });
-        
-        requestAnimationFrame(drawGrid); 
+
+        requestAnimationFrame(drawGrid);
     }
-    
+
     const togglePixelsBtn = document.getElementById('toggle-oled-pixels'); let pixelsOn = true;
-    if(togglePixelsBtn){ togglePixelsBtn.addEventListener('click', () => { pixelsOn = !pixelsOn; uiSound.playToggleState(pixelsOn); document.querySelectorAll('.oled-subpixel').forEach(el => { if (pixelsOn) el.classList.remove('off'); else el.classList.add('off'); }); togglePixelsBtn.innerText = pixelsOn ? "Turn Power OFF" : "Turn Power ON"; }); }
-    
+    if (togglePixelsBtn) { togglePixelsBtn.addEventListener('click', () => { pixelsOn = !pixelsOn; uiSound.playToggleState(pixelsOn); document.querySelectorAll('.oled-subpixel').forEach(el => { if (pixelsOn) el.classList.remove('off'); else el.classList.add('off'); }); togglePixelsBtn.innerText = pixelsOn ? "Turn Power OFF" : "Turn Power ON"; }); }
+
     const toggleEnvBtn = document.getElementById('toggle-env-btn'); const glareOverlay = document.getElementById('glare-overlay'); const oledScreenBg = document.getElementById('oled-screen-bg'); let isDay = false;
-    if(toggleEnvBtn){ toggleEnvBtn.addEventListener('click', () => { isDay = !isDay; uiSound.playToggleState(isDay); if(isDay) { if(glareOverlay) glareOverlay.style.opacity = '1'; if(oledScreenBg) oledScreenBg.setAttribute('fill', '#333'); toggleEnvBtn.innerText = 'Switch to Night Room'; } else { if(glareOverlay) glareOverlay.style.opacity = '0'; if(oledScreenBg) oledScreenBg.setAttribute('fill', '#03030a'); toggleEnvBtn.innerText = 'Turn ON Room Lights'; } }); }
-    
-    const btnProtect = document.getElementById('btn-protect'); const ghostGroup = document.getElementById('burn-in-ghost'); const scanLine = document.getElementById('oled-scanner'); let isCleaned = false; 
-    if(btnProtect){ btnProtect.addEventListener('click', () => { if (!isCleaned) { uiSound.playToggleState(true); btnProtect.disabled = true; btnProtect.innerText = "Running Laser Scan..."; if(scanLine) scanLine.classList.add('run-scan'); setTimeout(() => { if(ghostGroup) ghostGroup.style.opacity = '0'; }, 1000); setTimeout(() => { if(scanLine) scanLine.classList.remove('run-scan'); btnProtect.innerText = "Reset Panel (Show Burn-in)"; btnProtect.disabled = false; isCleaned = true; }, 2500); } else { uiSound.playToggleState(false); if(ghostGroup) ghostGroup.style.opacity = '0.6'; btnProtect.innerText = "Run Pixel Refresher"; isCleaned = false; } }); }
+    if (toggleEnvBtn) { toggleEnvBtn.addEventListener('click', () => { isDay = !isDay; uiSound.playToggleState(isDay); if (isDay) { if (glareOverlay) glareOverlay.style.opacity = '1'; if (oledScreenBg) oledScreenBg.setAttribute('fill', '#333'); toggleEnvBtn.innerText = 'Switch to Night Room'; } else { if (glareOverlay) glareOverlay.style.opacity = '0'; if (oledScreenBg) oledScreenBg.setAttribute('fill', '#03030a'); toggleEnvBtn.innerText = 'Turn ON Room Lights'; } }); }
+
+    const btnProtect = document.getElementById('btn-protect'); const ghostGroup = document.getElementById('burn-in-ghost'); const scanLine = document.getElementById('oled-scanner'); let isCleaned = false;
+    if (btnProtect) { btnProtect.addEventListener('click', () => { if (!isCleaned) { uiSound.playToggleState(true); btnProtect.disabled = true; btnProtect.innerText = "Running Laser Scan..."; if (scanLine) scanLine.classList.add('run-scan'); setTimeout(() => { if (ghostGroup) ghostGroup.style.opacity = '0'; }, 1000); setTimeout(() => { if (scanLine) scanLine.classList.remove('run-scan'); btnProtect.innerText = "Reset Panel (Show Burn-in)"; btnProtect.disabled = false; isCleaned = true; }, 2500); } else { uiSound.playToggleState(false); if (ghostGroup) ghostGroup.style.opacity = '0.6'; btnProtect.innerText = "Run Pixel Refresher"; isCleaned = false; } }); }
 
     // ==========================================
     // CAPSTONE: ADVANCED POOLED D.I.S.C ENGINE
@@ -1728,16 +1775,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const dialogueTextSpan = document.getElementById('dialogue-text-span'); const speakerTag = document.getElementById('speaker-tag'); const choicesBox = document.getElementById('choices-box'); const continuePrompt = document.getElementById('continue-prompt'); const dialogueBox = document.getElementById('dialogue-box'); const overlay = document.getElementById('rpg-overlay'); const aftermathTitle = document.getElementById('aftermath-title'); const aftermathText = document.getElementById('aftermath-text'); const btnNextCustomer = document.getElementById('btn-next-customer'); const btnPersistentFinish = document.getElementById('btn-persistent-finish'); const progressText = document.getElementById('rpg-progress');
 
-    function updateProgress(phase, ratio) { if(progressText) progressText.innerText = `Phase: ${phase} ${ratio}`; }
+    function updateProgress(phase, ratio) { if (progressText) progressText.innerText = `Phase: ${phase} ${ratio}`; }
 
     function typeText(text, speaker, nextState, showContinue = true, onCompleteCallback = null) {
         if (!dialogueTextSpan || !speakerTag) return;
-        if(typingTimeout) clearTimeout(typingTimeout);
+        if (typingTimeout) clearTimeout(typingTimeout);
         speakerTag.innerText = speaker; speakerTag.style.background = (speaker === "You") ? "var(--accent)" : "var(--text-primary)";
-        dialogueTextSpan.innerHTML = ""; 
-        if(continuePrompt) continuePrompt.style.display = "none"; 
-        if(choicesBox) choicesBox.innerHTML = "";
-        
+        dialogueTextSpan.innerHTML = "";
+        if (continuePrompt) continuePrompt.style.display = "none";
+        if (choicesBox) choicesBox.innerHTML = "";
+
         if (audioEnabled) {
             let activeProfile = { pitch: 1.0, type: 'neutral' };
             if (speaker === "You") activeProfile = associateVoice;
@@ -1747,14 +1794,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
         let i = 0;
         function typeChar() {
-            if (i < text.length) { dialogueTextSpan.innerHTML += text.charAt(i); i++; typingTimeout = setTimeout(typeChar, 20); } 
-            else { if(showContinue && continuePrompt) continuePrompt.style.display = "block"; rpgState = nextState; if(onCompleteCallback) onCompleteCallback(); }
+            if (i < text.length) { dialogueTextSpan.innerHTML += text.charAt(i); i++; typingTimeout = setTimeout(typeChar, 20); }
+            else { if (showContinue && continuePrompt) continuePrompt.style.display = "block"; rpgState = nextState; if (onCompleteCallback) onCompleteCallback(); }
         }
         typeChar();
     }
 
     function renderChoices(options, callback, prefix = "") {
-        if(!continuePrompt || !choicesBox) return;
+        if (!continuePrompt || !choicesBox) return;
         continuePrompt.style.display = "none"; choicesBox.innerHTML = "";
         options.forEach(opt => {
             const btn = document.createElement('button'); btn.className = "choice-btn" + (opt.phase === "TRANSITION" ? " transition-btn" : "");
@@ -1766,8 +1813,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function advanceRPG() {
-        if (rpgState === "INIT" || rpgState === "WAIT" || rpgState === "WAIT_CLICK") return; 
-        if (rpgState === "INTRO_2") { rpgState = "WAIT"; typeText("Yes of course, what can I help you with today?", "You", "INTRO_3"); } 
+        if (rpgState === "INIT" || rpgState === "WAIT" || rpgState === "WAIT_CLICK") return;
+        if (rpgState === "INTRO_2") { rpgState = "WAIT"; typeText("Yes of course, what can I help you with today?", "You", "INTRO_3"); }
         else if (rpgState === "INTRO_3") { rpgState = "WAIT"; typeText("I'm looking for a new TV and need some guidance on what technology makes sense for me.", currentNPC.name, "DISCOVER_CHOICE"); }
         else if (rpgState === "DISCOVER_CHOICE") {
             rpgState = "WAIT"; updateProgress("DISCOVER", `(${discoverCount}/4)`);
@@ -1793,28 +1840,28 @@ document.addEventListener("DOMContentLoaded", () => {
             rpgState = "WAIT"; updateProgress("CLOSE", "");
             renderChoices([{ id: "led", tag: "RECOMMEND", text: "Standard LED TV", phase: "CLOSE" }, { id: "qled", tag: "RECOMMEND", text: "QLED TV", phase: "CLOSE" }, { id: "miniled", tag: "RECOMMEND", text: "Premium Mini-LED TV", phase: "CLOSE" }, { id: "oled", tag: "RECOMMEND", text: "Premium OLED TV", phase: "CLOSE" }], handleChoice);
         }
-        else if (rpgState === "END_SALE") { 
-            rpgState = "WAIT"; if(overlay) overlay.classList.add('active'); hasCompletedOneScenario = true; if(btnPersistentFinish) btnPersistentFinish.style.display = 'block';
-            if (activeScenarioPool.length === 0) { 
-                if(btnNextCustomer) btnNextCustomer.style.display = 'none'; 
-                if(aftermathTitle) aftermathTitle.innerText = "SHIFT COMPLETE"; 
-                if(aftermathText) aftermathText.innerText += "\n\nShift Complete. You have successfully helped all customers on the floor today. Excellent work applying the D.I.S.C. framework."; 
+        else if (rpgState === "END_SALE") {
+            rpgState = "WAIT"; if (overlay) overlay.classList.add('active'); hasCompletedOneScenario = true; if (btnPersistentFinish) btnPersistentFinish.style.display = 'block';
+            if (activeScenarioPool.length === 0) {
+                if (btnNextCustomer) btnNextCustomer.style.display = 'none';
+                if (aftermathTitle) aftermathTitle.innerText = "SHIFT COMPLETE";
+                if (aftermathText) aftermathText.innerText += "\n\nShift Complete. You have successfully helped all customers on the floor today. Excellent work applying the D.I.S.C. framework.";
             }
         }
     }
 
     function handleChoice(id, opt) {
-        if(choicesBox) choicesBox.innerHTML = ""; rpgState = "WAIT";
+        if (choicesBox) choicesBox.innerHTML = ""; rpgState = "WAIT";
         if (opt.phase === "TRANSITION") {
             let summaryText = "";
             if (askedSummaries.length > 1) summaryText = askedSummaries.slice(0, -1).join(", ") + ", and " + askedSummaries[askedSummaries.length - 1];
-            else summaryText = askedSummaries[0]; 
+            else summaryText = askedSummaries[0];
             typeText(`Okay, so I understand that ${summaryText}. Is that correct?`, "You", "WAIT_CLICK", true);
         } else if (opt.phase === "INSPIRE") {
             const fullText = "Awesome, based on your environment, I want to recommend a viewing experience that " + opt.text.replace("...", "");
             typeText(fullText, "You", "NPC_REPLY", false, () => { setTimeout(() => { typeText(currentScenario.inspire, currentNPC.name, "SOLVE_CHOICE"); }, 2000); });
         } else if (opt.phase === "CLOSE") {
-            let factors = askedSummaries.slice(0, 2).join(" and "); if (!factors) factors = "what we've discussed"; 
+            let factors = askedSummaries.slice(0, 2).join(" and "); if (!factors) factors = "what we've discussed";
             let techReason = ""; let tvName = "";
             if (id === "led") { tvName = "Standard LED TV"; techReason = "it provides a versatile, highly reliable display without overspending"; }
             if (id === "qled") { tvName = "QLED TV"; techReason = "it provides fantastic color volume for bright rooms on a moderate budget"; }
@@ -1823,10 +1870,10 @@ document.addEventListener("DOMContentLoaded", () => {
             const closePitch = `Since ${factors}, I highly recommend the ${tvName} because ${techReason}. Shall we go ahead and get this boxed up for you?`;
             typeText(closePitch, "You", "NPC_REPLY", false, () => {
                 setTimeout(() => {
-                    if(aftermathTitle) aftermathTitle.innerText = "30 DAYS LATER..."; 
-                    if(aftermathText) aftermathText.innerText = currentScenario.aftermath[id];
-                    if (currentScenario.aftermath[id].startsWith("KEPT")) { scoreKept++; const el = document.getElementById('score-kept'); if(el) el.innerText = scoreKept; } 
-                    else { scoreReturned++; const el = document.getElementById('score-returned'); if(el) el.innerText = scoreReturned; }
+                    if (aftermathTitle) aftermathTitle.innerText = "30 DAYS LATER...";
+                    if (aftermathText) aftermathText.innerText = currentScenario.aftermath[id];
+                    if (currentScenario.aftermath[id].startsWith("KEPT")) { scoreKept++; const el = document.getElementById('score-kept'); if (el) el.innerText = scoreKept; }
+                    else { scoreReturned++; const el = document.getElementById('score-returned'); if (el) el.innerText = scoreReturned; }
                     typeText("Sounds great, I trust your recommendation! Let's get it set up.", currentNPC.name, "END_SALE");
                 }, 3000);
             });
@@ -1834,7 +1881,7 @@ document.addEventListener("DOMContentLoaded", () => {
             typeText(opt.text, "You", "NPC_REPLY", false, () => {
                 rpgState = "WAIT_NPC_REPLY_DELAY";
                 setTimeout(() => {
-                    if(opt.phase === "DISCOVER") {
+                    if (opt.phase === "DISCOVER") {
                         discoverCount++; discoverQuestionsLeft = discoverQuestionsLeft.filter(q => q.id !== id); askedSummaries.push(currentScenario.discover[id].summary);
                         let nextState = "DISCOVER_CHOICE"; if (discoverCount === 4) nextState = "FORCE_TRANSITION"; else if (discoverCount >= 3) nextState = "DISCOVER_OR_TRANSITION";
                         typeText(currentScenario.discover[id].response, currentNPC.name, nextState);
@@ -1845,37 +1892,37 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const dialogueBoxEl = document.getElementById('dialogue-box');
-    if(dialogueBoxEl) dialogueBoxEl.addEventListener('click', () => {
-        if (rpgState === "WAIT_CLICK") { rpgState = "WAIT"; uiSound.playStepForward(); typeText("Yes, exactly! That's exactly what I'm dealing with.", currentNPC.name, "INSPIRE_CHOICE"); } 
+    if (dialogueBoxEl) dialogueBoxEl.addEventListener('click', () => {
+        if (rpgState === "WAIT_CLICK") { rpgState = "WAIT"; uiSound.playStepForward(); typeText("Yes, exactly! That's exactly what I'm dealing with.", currentNPC.name, "INSPIRE_CHOICE"); }
         else if (rpgState !== "WAIT" && rpgState !== "WAIT_NPC_REPLY_DELAY") { uiSound.playStepForward(); advanceRPG(); }
     });
 
     function initRPG() {
-        if(overlay) overlay.classList.remove('active');
+        if (overlay) overlay.classList.remove('active');
         if (activeScenarioPool.length === 0) activeScenarioPool = [...masterScenarioBank];
         if (hasCompletedOneScenario && btnPersistentFinish) btnPersistentFinish.style.display = 'block';
-        const randIndex = Math.floor(Math.random() * activeScenarioPool.length); currentScenario = activeScenarioPool[randIndex]; currentNPC = currentScenario; 
+        const randIndex = Math.floor(Math.random() * activeScenarioPool.length); currentScenario = activeScenarioPool[randIndex]; currentNPC = currentScenario;
         activeScenarioPool.splice(randIndex, 1);
-        discoverQuestionsLeft = [...associateBank.discover]; askedSummaries = []; discoverCount = 0; 
-        if(btnNextCustomer) btnNextCustomer.style.display = 'block'; 
-        updateProgress("GREET", ""); 
-        
-        const avatarEl = document.getElementById('npc-avatar'); if(avatarEl) avatarEl.innerText = currentNPC.avatar; 
-        const nameEl = document.getElementById('npc-name'); if(nameEl) nameEl.innerText = currentNPC.name; 
-        const descEl = document.getElementById('npc-desc'); if(descEl) descEl.innerText = currentScenario.desc;
-        
-        if(speakerTag) { speakerTag.innerText = "System"; speakerTag.style.background = "var(--text-primary)"; }
-        if(dialogueTextSpan) dialogueTextSpan.innerText = "Click below to start your shift."; 
-        if(continuePrompt) continuePrompt.style.display = "none"; 
-        if(choicesBox) choicesBox.innerHTML = "";
-        
+        discoverQuestionsLeft = [...associateBank.discover]; askedSummaries = []; discoverCount = 0;
+        if (btnNextCustomer) btnNextCustomer.style.display = 'block';
+        updateProgress("GREET", "");
+
+        const avatarEl = document.getElementById('npc-avatar'); if (avatarEl) avatarEl.innerText = currentNPC.avatar;
+        const nameEl = document.getElementById('npc-name'); if (nameEl) nameEl.innerText = currentNPC.name;
+        const descEl = document.getElementById('npc-desc'); if (descEl) descEl.innerText = currentScenario.desc;
+
+        if (speakerTag) { speakerTag.innerText = "System"; speakerTag.style.background = "var(--text-primary)"; }
+        if (dialogueTextSpan) dialogueTextSpan.innerText = "Click below to start your shift.";
+        if (continuePrompt) continuePrompt.style.display = "none";
+        if (choicesBox) choicesBox.innerHTML = "";
+
         const startBtn = document.createElement('button'); startBtn.className = "choice-btn"; startBtn.id = "btn-start-rpg"; startBtn.innerHTML = `<span class="choice-tag">SYS</span> Greet Approaching Customer`;
-        startBtn.addEventListener('click', (e) => { e.stopPropagation(); uiSound.playStepForward(); if(choicesBox) choicesBox.innerHTML = ""; rpgState = "WAIT"; typeText("Hi, I need some help deciding what TV I should buy.", currentNPC.name, "INTRO_2"); });
-        if(choicesBox) choicesBox.appendChild(startBtn);
+        startBtn.addEventListener('click', (e) => { e.stopPropagation(); uiSound.playStepForward(); if (choicesBox) choicesBox.innerHTML = ""; rpgState = "WAIT"; typeText("Hi, I need some help deciding what TV I should buy.", currentNPC.name, "INTRO_2"); });
+        if (choicesBox) choicesBox.appendChild(startBtn);
     }
 
-    if(btnNextCustomer) btnNextCustomer.addEventListener('click', () => { uiSound.playStepForward(); initRPG(); });
-    if(btnPersistentFinish) btnPersistentFinish.addEventListener('click', () => { uiSound.playForward(); slideCompletion[8] = true; goToSlide(9); });
+    if (btnNextCustomer) btnNextCustomer.addEventListener('click', () => { uiSound.playStepForward(); initRPG(); });
+    if (btnPersistentFinish) btnPersistentFinish.addEventListener('click', () => { uiSound.playForward(); slideCompletion[8] = true; goToSlide(9); });
 
     // --- SLIDE 6: ENVIRONMENT COMPARISON CONTROLLER ---
     const btnEnvTheater = document.getElementById('btn-env-theater');
@@ -1910,23 +1957,33 @@ document.addEventListener("DOMContentLoaded", () => {
     function updateEnvironment(envClass, envName) {
         uiSound.playToggleState(true);
         currentEnv = envName;
-        if(masterScene) masterScene.className = `scene-container ${envClass}`;
-        
-        if(btnEnvTheater) btnEnvTheater.classList.remove('active');
-        if(btnEnvSunroom) btnEnvSunroom.classList.remove('active');
-        if(btnEnvGarage) btnEnvGarage.classList.remove('active');
-        
+        if (masterScene) masterScene.className = `scene-container ${envClass}`;
+
+        if (btnEnvTheater) btnEnvTheater.classList.remove('active');
+        if (btnEnvSunroom) btnEnvSunroom.classList.remove('active');
+        if (btnEnvGarage) btnEnvGarage.classList.remove('active');
+
         if (envName === 'theater' && btnEnvTheater) btnEnvTheater.classList.add('active');
         if (envName === 'sunroom' && btnEnvSunroom) btnEnvSunroom.classList.add('active');
         if (envName === 'garage' && btnEnvGarage) btnEnvGarage.classList.add('active');
+
+        // Dynamic Environment Features
+        const garageDecor = document.querySelector('.garage-decor');
+        if (envName === 'garage') {
+            uiSound.startGarageHum();
+            if (garageDecor) garageDecor.classList.add('flicker-active');
+        } else {
+            if (typeof uiSound.stopGarageHum === 'function') uiSound.stopGarageHum();
+            if (garageDecor) garageDecor.classList.remove('flicker-active');
+        }
 
         updatePanelEval('a');
         updatePanelEval('b');
     }
 
-    if(btnEnvTheater) btnEnvTheater.addEventListener('click', () => updateEnvironment('env-theater', 'theater'));
-    if(btnEnvSunroom) btnEnvSunroom.addEventListener('click', () => updateEnvironment('env-sunroom', 'sunroom'));
-    if(btnEnvGarage) btnEnvGarage.addEventListener('click', () => updateEnvironment('env-garage', 'garage'));
+    if (btnEnvTheater) btnEnvTheater.addEventListener('click', () => updateEnvironment('env-theater', 'theater'));
+    if (btnEnvSunroom) btnEnvSunroom.addEventListener('click', () => updateEnvironment('env-sunroom', 'sunroom'));
+    if (btnEnvGarage) btnEnvGarage.addEventListener('click', () => updateEnvironment('env-garage', 'garage'));
 
     function bindEnvironmentPanel(selectId, panelId, panelLetter) {
         const selectEl = document.getElementById(selectId);
@@ -1946,12 +2003,12 @@ document.addEventListener("DOMContentLoaded", () => {
         const selectEl = document.getElementById(`compare-select-${panelLetter}`);
         const evalTextEl = document.getElementById(`eval-text-${panelLetter}`);
         if (!selectEl || !evalTextEl) return;
-        
+
         const evalTitleEl = evalTextEl.parentElement.querySelector('.eval-title');
         const tech = selectEl.value;
         const data = evalData[tech][currentEnv];
 
-        if(evalTitleEl) {
+        if (evalTitleEl) {
             evalTitleEl.innerText = data.title;
             evalTitleEl.style.color = data.color;
         }
@@ -1961,6 +2018,6 @@ document.addEventListener("DOMContentLoaded", () => {
     bindEnvironmentPanel('compare-select-a', 'compare-panel-a', 'a');
     bindEnvironmentPanel('compare-select-b', 'compare-panel-b', 'b');
 
-    initRPG(); 
+    initRPG();
     goToSlide(0);
 });
