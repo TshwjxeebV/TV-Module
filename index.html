@@ -22,7 +22,7 @@
         <button class="toc-link" data-target="3">3. QLED</button>
         <button class="toc-link" data-target="4">4. Mini-LED</button>
         <button class="toc-link" data-target="5">5. OLED</button>
-        <button class="toc-link" data-target="6">6. Environment Synthesis</button>
+        <button class="toc-link" data-target="6">6. Environment Comparison</button>
         <button class="toc-link" data-target="7">7. Simulator Intro</button>
         <button class="toc-link" data-target="8">8. DISC Simulator</button>
         <button class="toc-link" data-target="9">9. Final Review Hub</button>
@@ -120,7 +120,7 @@
                             <div style="display: flex; align-items: center; justify-content: center; width: 100%; gap: 15px;">
                                 <div id="fire-intensity-wrapper" style="display: none; flex-direction: column; align-items: center; justify-content: center; height: 100%;">
                                     <span style="font-size: 0.65rem; color: #ff3b30; font-weight: bold; letter-spacing: 0.05em; margin-bottom: 5px;">MAX</span>
-                                    <input type="range" id="fire-intensity-slider" min="0" max="100" value="50" style="-webkit-appearance: slider-vertical; appearance: slider-vertical; width: 15px; height: 160px; accent-color: #FFD60A; cursor: pointer; background: rgba(255,255,255,0.1); border-radius: 10px;">
+                                    <input type="range" id="fire-intensity-slider" min="0" max="100" value="50" style="-webkit-appearance: slider-vertical; width: 15px; height: 160px; accent-color: #FFD60A; cursor: pointer; background: rgba(255,255,255,0.1); border-radius: 10px;">
                                     <span style="font-size: 0.65rem; color: #007aff; font-weight: bold; letter-spacing: 0.05em; margin-top: 5px;">MIN</span>
                                 </div>
                                 <div class="visual-box" style="background:#000; flex-grow: 1; max-width: calc(100% - 40px); border: 1px solid #222; position: relative;">
@@ -128,6 +128,7 @@
                                 </div>
                             </div>
                             
+                            <!-- UDL Persistent Caption Container -->
                             <div id="udl-fire-caption" aria-live="polite" style="display: flex; align-items: center; justify-content: center; flex-direction: column; text-align: center; color: #666; font-size: 0.9rem; font-weight: 600; margin-top: 15px; padding: 12px; background: rgba(0,0,0,0.5); border-radius: 8px; border: 1px solid var(--glass-border); width: 100%; box-sizing: border-box; min-height: 130px; transition: color 0.3s ease;"><strong>Light Beam:</strong> Hover over the grid to observe standard backlight tracking.</div>
                             
                             <div class="sprite-toggles" style="margin-top: 15px;">
@@ -274,7 +275,7 @@
                 </div>
             </div>
 
-            <!-- Slide 6: Environment Synthesis (NEW) -->
+            <!-- Slide 6: Environment Comparison (NEW) -->
             <div class="slide-container full-width" id="slide-6">
                 <div class="content-wrapper fade-element">
                     <div style="text-align: center; margin-bottom: 10px;">
@@ -288,45 +289,27 @@
                         <div class="env-controls">
                             <button id="btn-env-theater" class="sprite-btn active">🎬 Home Theater (Dark)</button>
                             <button id="btn-env-sunroom" class="sprite-btn">☀️ Sunlit Living Room (Bright)</button>
-                            <button id="btn-env-garage" class="sprite-btn">🏈 Garage / Patio (Football Season)</button>
+                            <button id="btn-env-garage" class="sprite-btn">🛠️ Garage / Patio (Casual)</button>
                         </div>
 
                         <div class="scene-container env-theater" id="master-scene">
-                            <!-- Theater Audio Setup -->
-                            <div class="theater-audio">
-                                <div class="speaker-tower left"></div>
-                                <div class="speaker-tower right"></div>
-                            </div>
-                            
-                            <!-- Sunroom Decor -->
-                            <div class="sunroom-decor">
-                                <div class="sunroom-soundbar"></div>
-                                <div class="media-console"></div>
-                            </div>
-
-                            <!-- Garage Decor (Active Lifestyle) -->
-                            <div class="garage-decor"></div>
-
-                            <!-- Vector Gallery Wall with Easter Eggs -->
+                            <!-- Vector Gallery Wall -->
                             <div class="gallery-wall">
-                                <!-- Art Frame 1: Couple Silhouette -->
                                 <div class="art-frame">
                                     <svg viewBox="0 0 100 100">
-                                        <path d="M40 50 A 10 10 0 1 1 40 30 A 10 10 0 1 1 40 50 M30 80 C 30 60, 50 60, 50 80 Z M60 55 A 9 9 0 1 1 60 37 A 9 9 0 1 1 60 55 M50 80 C 50 65, 70 65, 70 80 Z" stroke="rgba(255,255,255,0.7)" fill="none" stroke-width="3"/>
+                                        <path d="M50 15 L80 32 L80 68 L50 85 L20 68 L20 32 Z" stroke="rgba(255,255,255,0.7)" fill="none"/>
+                                        <path d="M50 85 L50 100 M80 68 L95 76 M20 68 L5 76" stroke="rgba(255,255,255,0.5)" fill="none"/>
                                     </svg>
                                 </div>
-                                <!-- Art Frame 2: Volleyball -->
                                 <div class="art-frame">
                                     <svg viewBox="0 0 100 100">
-                                        <circle cx="50" cy="50" r="30" stroke="rgba(255,255,255,0.7)" fill="none" stroke-width="3"/>
-                                        <path d="M35 25 C 50 40, 50 60, 35 75 M65 25 C 50 40, 50 60, 65 75 M25 35 C 40 50, 60 50, 75 35 M25 65 C 40 50, 60 50, 75 65" stroke="rgba(255,255,255,0.7)" fill="none" stroke-width="3"/>
+                                        <path d="M0 35 Q 25 15, 50 35 T 100 35 M0 55 Q 25 35, 50 55 T 100 55 M0 75 Q 25 55, 50 75 T 100 75" stroke="rgba(255,255,255,0.7)" fill="none"/>
+                                        <circle cx="75" cy="20" r="5" stroke="none" fill="rgba(255,255,255,0.8)"/>
                                     </svg>
                                 </div>
-                                <!-- Art Frame 3: Molecular Hexagon -->
                                 <div class="art-frame">
                                     <svg viewBox="0 0 100 100">
-                                        <polygon points="50,20 76,35 76,65 50,80 24,65 24,35" stroke="rgba(255,255,255,0.7)" fill="none" stroke-width="3"/>
-                                        <circle cx="50" cy="50" r="10" stroke="rgba(255,255,255,0.7)" fill="none" stroke-width="3"/>
+                                        <path d="M25 85 L25 45 A 25 25 0 0 1 75 45 L75 85 M38 85 L38 45 A 12 12 0 0 1 62 45 L62 85" stroke="rgba(255,255,255,0.7)" fill="none"/>
                                     </svg>
                                 </div>
                             </div>
@@ -343,9 +326,8 @@
                                     <div class="bloom-layer"></div>
                                     <div class="washout-overlay"></div>
                                     <div class="tv-content">DISPLAY A</div>
-                                    <div class="room-reflection"></div>
+                                    <div class="reflection-layer"></div>
                                 </div>
-                                <div class="speaker-center"></div>
                                 <div class="eval-board">
                                     <div class="eval-title" style="color: var(--accent);">UDL Analysis</div>
                                     <div class="eval-text" id="eval-text-a">PERFECT FIT: Infinite contrast allows for flawless shadow detail in pitch-black rooms. No blooming.</div>
@@ -364,9 +346,8 @@
                                     <div class="bloom-layer"></div>
                                     <div class="washout-overlay"></div>
                                     <div class="tv-content">DISPLAY B</div>
-                                    <div class="room-reflection"></div>
+                                    <div class="reflection-layer"></div>
                                 </div>
-                                <div class="speaker-center"></div>
                                 <div class="eval-board">
                                     <div class="eval-title" style="color: var(--accent);">UDL Analysis</div>
                                     <div class="eval-text" id="eval-text-b">EXCELLENT FIT: High brightness pops beautifully, though slight blooming around bright objects may be visible in total darkness.</div>
