@@ -22,9 +22,9 @@
         <button class="toc-link" data-target="3">3. QLED</button>
         <button class="toc-link" data-target="4">4. Mini-LED</button>
         <button class="toc-link" data-target="5">5. OLED</button>
-        <button class="toc-link" data-target="6">6. Simulator Intro</button>
-        <button class="toc-link" data-target="7">7. DISC Simulator</button>
-        <button class="toc-link" data-target="8">8. Advanced Comparison</button>
+        <button class="toc-link" data-target="6">6. Environment Synthesis</button>
+        <button class="toc-link" data-target="7">7. Simulator Intro</button>
+        <button class="toc-link" data-target="8">8. DISC Simulator</button>
         <button class="toc-link" data-target="9">9. Final Review Hub</button>
         <button id="btn-restart" class="toc-restart">↻ Restart Module</button>
     </nav>
@@ -274,8 +274,111 @@
                 </div>
             </div>
 
-            <!-- Slide 6: Simulator Intro (Welcome to the Floor) -->
+            <!-- Slide 6: Environment Synthesis (NEW) -->
             <div class="slide-container full-width" id="slide-6">
+                <div class="content-wrapper fade-element">
+                    <div style="text-align: center; margin-bottom: 10px;">
+                        <h3 style="margin-bottom: 8px;">Environment Synthesis</h3>
+                        <p class="attribute-text" style="max-width: 800px; margin-inline: auto;">
+                            Select a room environment below to observe how ambient lighting completely transforms the performance of different panel architectures.
+                        </p>
+                    </div>
+
+                    <div class="comparison-stage">
+                        <div class="env-controls">
+                            <button id="btn-env-theater" class="sprite-btn active">🎬 Home Theater (Dark)</button>
+                            <button id="btn-env-sunroom" class="sprite-btn">☀️ Sunlit Living Room (Bright)</button>
+                            <button id="btn-env-garage" class="sprite-btn">🏈 Garage / Patio (Football Season)</button>
+                        </div>
+
+                        <div class="scene-container env-theater" id="master-scene">
+                            <!-- Theater Audio Setup -->
+                            <div class="theater-audio">
+                                <div class="speaker-tower left"></div>
+                                <div class="speaker-tower right"></div>
+                            </div>
+                            
+                            <!-- Sunroom Decor -->
+                            <div class="sunroom-decor">
+                                <div class="sunroom-soundbar"></div>
+                                <div class="media-console"></div>
+                            </div>
+
+                            <!-- Garage Decor (Active Lifestyle) -->
+                            <div class="garage-decor"></div>
+
+                            <!-- Vector Gallery Wall with Easter Eggs -->
+                            <div class="gallery-wall">
+                                <!-- Art Frame 1: Couple Silhouette -->
+                                <div class="art-frame">
+                                    <svg viewBox="0 0 100 100">
+                                        <path d="M40 50 A 10 10 0 1 1 40 30 A 10 10 0 1 1 40 50 M30 80 C 30 60, 50 60, 50 80 Z M60 55 A 9 9 0 1 1 60 37 A 9 9 0 1 1 60 55 M50 80 C 50 65, 70 65, 70 80 Z" stroke="rgba(255,255,255,0.7)" fill="none" stroke-width="3"/>
+                                    </svg>
+                                </div>
+                                <!-- Art Frame 2: Volleyball -->
+                                <div class="art-frame">
+                                    <svg viewBox="0 0 100 100">
+                                        <circle cx="50" cy="50" r="30" stroke="rgba(255,255,255,0.7)" fill="none" stroke-width="3"/>
+                                        <path d="M35 25 C 50 40, 50 60, 35 75 M65 25 C 50 40, 50 60, 65 75 M25 35 C 40 50, 60 50, 75 35 M25 65 C 40 50, 60 50, 75 65" stroke="rgba(255,255,255,0.7)" fill="none" stroke-width="3"/>
+                                    </svg>
+                                </div>
+                                <!-- Art Frame 3: Molecular Hexagon -->
+                                <div class="art-frame">
+                                    <svg viewBox="0 0 100 100">
+                                        <polygon points="50,20 76,35 76,65 50,80 24,65 24,35" stroke="rgba(255,255,255,0.7)" fill="none" stroke-width="3"/>
+                                        <circle cx="50" cy="50" r="10" stroke="rgba(255,255,255,0.7)" fill="none" stroke-width="3"/>
+                                    </svg>
+                                </div>
+                            </div>
+
+                            <!-- Display A -->
+                            <div class="tv-mount">
+                                <select id="compare-select-a" class="tech-dropdown">
+                                    <option value="oled" selected>Premium OLED</option>
+                                    <option value="miniled">QD-Mini LED</option>
+                                    <option value="qled">Standard QLED</option>
+                                    <option value="led">Standard LED</option>
+                                </select>
+                                <div class="tv-frame panel-oled" id="compare-panel-a">
+                                    <div class="bloom-layer"></div>
+                                    <div class="washout-overlay"></div>
+                                    <div class="tv-content">DISPLAY A</div>
+                                    <div class="room-reflection"></div>
+                                </div>
+                                <div class="speaker-center"></div>
+                                <div class="eval-board">
+                                    <div class="eval-title" style="color: var(--accent);">UDL Analysis</div>
+                                    <div class="eval-text" id="eval-text-a">PERFECT FIT: Infinite contrast allows for flawless shadow detail in pitch-black rooms. No blooming.</div>
+                                </div>
+                            </div>
+
+                            <!-- Display B -->
+                            <div class="tv-mount">
+                                <select id="compare-select-b" class="tech-dropdown">
+                                    <option value="oled">Premium OLED</option>
+                                    <option value="miniled" selected>QD-Mini LED</option>
+                                    <option value="qled">Standard QLED</option>
+                                    <option value="led">Standard LED</option>
+                                </select>
+                                <div class="tv-frame panel-miniled" id="compare-panel-b">
+                                    <div class="bloom-layer"></div>
+                                    <div class="washout-overlay"></div>
+                                    <div class="tv-content">DISPLAY B</div>
+                                    <div class="room-reflection"></div>
+                                </div>
+                                <div class="speaker-center"></div>
+                                <div class="eval-board">
+                                    <div class="eval-title" style="color: var(--accent);">UDL Analysis</div>
+                                    <div class="eval-text" id="eval-text-b">EXCELLENT FIT: High brightness pops beautifully, though slight blooming around bright objects may be visible in total darkness.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 7: NEW MODULE BRIEFING -->
+            <div class="slide-container full-width" id="slide-7">
                 <div class="content-wrapper fade-element">
                     <h3 style="text-align: center; margin-bottom: 15px; font-size: 3rem;">Welcome to the Floor</h3>
                     <p class="attribute-text" style="text-align: center; max-width: 700px; margin-inline: auto; margin-bottom: 30px;">
@@ -297,8 +400,8 @@
                 </div>
             </div>
 
-            <!-- Slide 7: CAPSTONE - FLUID RPG DISC Simulator -->
-            <div class="slide-container full-width" id="slide-7">
+            <!-- Slide 8: CAPSTONE - FLUID RPG DISC Simulator -->
+            <div class="slide-container full-width" id="slide-8">
                 <div class="content-wrapper fade-element">
                     <h3 style="text-align: center;">Capstone: The Sales Floor</h3>
                     <p class="attribute-text" style="text-align: center; margin-bottom: clamp(15px, 3vh, 30px);">Apply the D.I.S.C. framework. Ask at least 3 Discovery questions to unlock the Inspire phase.</p>
@@ -332,58 +435,6 @@
                                 <div class="continue-prompt" id="continue-prompt" style="display:none;">Click to continue ▼</div>
                             </div>
                             <div class="choices-box" id="choices-box"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Slide 8: Advanced Display Comparison -->
-            <div class="slide-container full-width" id="slide-8">
-                <div class="content-wrapper fade-element">
-                    <div style="text-align: center; margin-bottom: 10px;">
-                        <h3 style="margin-bottom: 8px;">Advanced Display Comparison</h3>
-                        <p class="attribute-text" style="max-width: 780px; margin-inline: auto;">
-                            Evaluate real-world trade-offs side by side. Toggle panel architectures to examine peak luminance, contrast ratios, and blooming behaviors.
-                        </p>
-                    </div>
-
-                    <div class="comparison-grid">
-                        <!-- Panel A -->
-                        <div class="comparison-panel" id="panel-a-container">
-                            <div class="panel-controls">
-                                <label for="select-display-a">Display A:</label>
-                                <select id="select-display-a" class="tech-select">
-                                    <option value="oled">LG / Sony OLED (Self-Emissive)</option>
-                                    <option value="miniled">TCL QD-Mini LED</option>
-                                    <option value="qled">Standard QLED</option>
-                                </select>
-                            </div>
-                            <div class="screen-simulator oled-profile" id="screen-a">
-                                <div class="bloom-effect" id="bloom-a"></div>
-                                <div class="screen-specs">
-                                    <span id="spec-nit-a">Peak: ~800 nits</span>
-                                    <span id="spec-contrast-a">Contrast: Infinite : 1</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Panel B -->
-                        <div class="comparison-panel" id="panel-b-container">
-                            <div class="panel-controls">
-                                <label for="select-display-b">Display B:</label>
-                                <select id="select-display-b" class="tech-select">
-                                    <option value="miniled" selected>TCL QD-Mini LED</option>
-                                    <option value="oled">LG / Sony OLED (Self-Emissive)</option>
-                                    <option value="qled">Standard QLED</option>
-                                </select>
-                            </div>
-                            <div class="screen-simulator miniled-profile" id="screen-b">
-                                <div class="bloom-effect" id="bloom-b"></div>
-                                <div class="screen-specs">
-                                    <span id="spec-nit-b">Peak: ~2000+ nits</span>
-                                    <span id="spec-contrast-b">Contrast: High (Dimming Zones)</span>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
