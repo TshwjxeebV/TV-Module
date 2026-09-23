@@ -451,7 +451,7 @@ h3 {
 .sequence-stack-container.stack-active .svg-stack-item:last-child {
     position: relative !important;
     width: 100% !important;
-    max-width: 650px !important;
+    max-width: clamp(350px, min(50vw, 65vh), 750px) !important; /* MATCHES ORIGINAL SVGs */
     opacity: 1 !important;
     pointer-events: auto !important;
 }
@@ -774,13 +774,12 @@ input[type=range] {
     margin-inline: auto;
     position: relative;
     overflow: hidden;
-    height: 55vh;
-    min-height: 400px;
-    max-height: 550px;
-    margin-bottom: 60px;
+    height: clamp(300px, 50vh, 550px); /* Fluid height constraint */
+    margin-bottom: clamp(10px, 2vh, 25px); /* Compress bottom margin */
     display: flex;
     flex-direction: column;
-    padding: clamp(20px, 4vh, 35px);
+    padding: clamp(15px, 3vh, 35px);
+    box-sizing: border-box; /* Crucial to keep borders intact */
 }
 
 .rpg-overlay {
@@ -1117,7 +1116,6 @@ input[type=range] {
     width: 100%;
     max-width: 1200px;
     margin-inline: auto;
-    /* Widened from 1000px to 1200px */
     background: #111;
     border: 1px solid var(--glass-border);
     border-radius: 20px;
@@ -1127,6 +1125,7 @@ input[type=range] {
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
     transition: background 0.5s ease;
     position: relative;
+    height: clamp(350px, 55vh, 600px); /* Locks container height */
 }
 
 .env-controls {
@@ -1141,11 +1140,17 @@ input[type=range] {
 }
 
 .scene-container {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 40px;
-    padding: 70px 60px 120px 60px; /* Increased bottom padding to 120px to protect descriptions */
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
+    gap: clamp(15px, 2vw, 30px);
+    padding: clamp(20px, 3vh, 40px); /* Reduces aggressive 120px bottom padding */
     position: relative;
-    background-size: cover; background-position: center;
+    background-size: cover; 
+    background-position: center;
     transition: background 0.8s ease;
+    overflow-y: auto; /* Enables internal scroll if squeezed */
+    height: 100%;
+    box-sizing: border-box;
 }
 
 .tv-mount {
@@ -1442,7 +1447,7 @@ input[type=range] {
     padding: 15px;
     width: 100%;
     box-sizing: border-box;
-    min-height: 120px;
+    min-height: 90px;
     backdrop-filter: blur(10px);
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
 }
@@ -1477,15 +1482,18 @@ input[type=range] {
 }
 
 /* --- Executive Synthesis Card (UDL-Optimized) --- */
-.synthesis-card {
+synthesis-card {
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid var(--glass-border);
     border-radius: 14px;
-    padding: 24px;
+    padding: clamp(15px, 3vh, 24px); /* Responsive padding */
     width: 100%;
-    max-width: 650px;
-    margin-top: 15px;
+    box-sizing: border-box; /* Prevents padding from inflating the card */
     backdrop-filter: blur(10px);
+    aspect-ratio: 1 / 1; /* MATCHES ORIGINAL SVG HEIGHT */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .synthesis-header {
