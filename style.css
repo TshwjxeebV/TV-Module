@@ -1111,57 +1111,103 @@ input[type=range] {
     }
 }
 
-/* --- Slide 6: Environment Synthesis Architecture --- */
-.comparison-stage {
-    width: 100%;
-    max-width: 1200px;
-    margin-inline: auto;
+/* --- Slide 6: FULLSCREEN Showroom Architecture --- */
+.comparison-stage.fullscreen-mode {
+    width: 100vw;
+    max-width: 100vw;
+    height: 100vh;
+    margin: 0;
     background: #111;
-    border: 1px solid var(--glass-border);
-    border-radius: 20px;
+    border: none;
+    border-radius: 0;
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
-    transition: background 0.5s ease;
     position: relative;
-    height: clamp(350px, 55vh, 600px); /* Locks container height */
 }
 
-.env-controls {
+/* 1. Informational HUD (Top Left) */
+.info-hud {
+    position: absolute;
+    top: clamp(20px, 4vh, 40px);
+    left: clamp(20px, 4vw, 40px);
+    z-index: 100;
+    background: rgba(17, 17, 17, 0.75);
+    backdrop-filter: blur(15px);
+    border: 1px solid var(--glass-border);
+    padding: clamp(15px, 3vh, 25px) clamp(20px, 3vw, 30px);
+    border-radius: 16px;
+    max-width: 420px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    pointer-events: none;
+}
+
+.info-hud h3 {
+    margin: 0 0 10px 0;
+    font-size: clamp(1.4rem, 2vw, 1.8rem);
+    line-height: 1.2;
+    color: #fff;
+    text-align: left;
+}
+
+.info-hud p {
+    margin: 0;
+    font-size: clamp(0.85rem, 1vw, 0.95rem);
+    color: var(--text-secondary);
+    line-height: 1.5;
+    text-align: left;
+}
+
+/* 2. Room Remote (Bottom Center) */
+.env-controls.floating-remote {
+    position: absolute;
+    bottom: clamp(70px, 10vh, 100px);
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 50px;
+    padding: 10px 20px;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6);
     display: flex;
-    justify-content: center;
     gap: 15px;
-    padding: 15px;
-    background: rgba(0, 0, 0, 0.8);
-    border-bottom: 1px solid var(--glass-border);
-    position: relative;
-    z-index: 20;
+    z-index: 100;
 }
 
-.scene-container {
+/* 3. The Fullscreen Grid */
+.scene-container.fullscreen-scene {
     display: grid; 
     grid-template-columns: 1fr 1fr; 
-    gap: clamp(15px, 2vw, 30px);
-    padding: clamp(20px, 3vh, 40px); /* Reduces aggressive 120px bottom padding */
+    gap: clamp(30px, 4vw, 80px);
+    padding: 0 clamp(40px, 8vw, 100px);
     position: relative;
     background-size: cover; 
     background-position: center;
     transition: background 0.8s ease;
-    overflow-y: auto; /* Enables internal scroll if squeezed */
-    height: 100%;
+    height: 100vh;
+    align-content: center; /* Locks TVs vertically in the middle */
     box-sizing: border-box;
 }
 
 .tv-mount {
-    width: 65%;
-    /* Restricts the TV to 65% of its column, making it appear 65" from 6ft away */
+    width: 100%; 
+    max-width: 650px;
     margin-inline: auto;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 15px;
     z-index: 10;
+    margin-top: -30px; /* Visual balance against the bottom remote */
+}
+
+/* 4. Unified Interaction Zone */
+.interaction-zone {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 15px;
 }
 
 /* Environment Backgrounds */
