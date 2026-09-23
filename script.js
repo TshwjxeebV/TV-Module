@@ -759,7 +759,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         currentGlobalSlide = index;
-        if (sliderWrapper) sliderWrapper.style.transform = `translateY(-${currentGlobalSlide * 100}vh)`;
+        if (sliderWrapper) sliderWrapper.style.transform = `translateY(-${currentGlobalSlide * 100}%)`;
 
         if(currentGlobalSlide === 0) { 
             if(navPrev) navPrev.classList.remove('visible'); 

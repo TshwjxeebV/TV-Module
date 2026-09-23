@@ -26,6 +26,34 @@ html {
     height: 100vh;
 }
 
+/* --- Application Layout (Flexbox Viewport Containment) --- */
+.app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
+}
+
+.module-header {
+    flex-shrink: 0; 
+}
+
+.slide-content-area {
+    flex: 1; 
+    overflow-y: auto; 
+    display: flex;
+    flex-direction: column;
+    order: 1; 
+    width: 100%; /* NEW: Force full width */
+    position: relative; /* NEW: Anchor for absolute slides if needed */
+}
+
+.module-navigation {
+    flex-shrink: 0; 
+    z-index: 10;
+    order: 2; /* Forces the buttons to the bottom */
+}
+
 /* --- Administrator & Accessibility Controls --- */
 #admin-controls {
     position: fixed;
@@ -189,13 +217,14 @@ body.toc-active .toc-sidebar {
 /* --- Sliders & Containers --- */
 #slider-wrapper {
     transition: transform 0.8s cubic-bezier(0.65, 0, 0.35, 1);
-    height: 100vh;
+    height: 100%; /* Changed from 100vh */
     width: 100%;
 }
 
 .slide-container {
-    height: 100vh;
+    height: 100%;
     width: 100%;
+    flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -404,22 +433,27 @@ h3 {
     height: 100%;
 }
 
+/* --- Clean Synthesis Display on Final Step --- */
 .sequence-stack-container.stack-active {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: clamp(10px, 2vw, 25px);
-    align-content: center;
-    justify-items: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
 }
 
-.sequence-stack-container.stack-active .svg-stack-item {
-    position: relative;
-    max-width: clamp(200px, 100%, 380px);
+/* Hide the individual step graphics when the synthesis card is active */
+.sequence-stack-container.stack-active .svg-stack-item:not(:last-child) {
+    display: none !important;
 }
 
-.sequence-stack-container.stack-active .svg-stack-item:nth-last-child(1):nth-child(odd) {
-    grid-column: 1 / -1;
-    max-width: clamp(220px, 55%, 400px);
+/* Ensure the final card takes center stage cleanly */
+.sequence-stack-container.stack-active .svg-stack-item:last-child {
+    position: relative !important;
+    width: 100% !important;
+    max-width: 650px !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
 }
 
 .svg-text-shadow {
@@ -1440,4 +1474,76 @@ input[type=range] {
     cursor: pointer;
     width: 100%;
     margin-bottom: 10px;
+}
+
+/* --- Executive Synthesis Card (UDL-Optimized) --- */
+.synthesis-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--glass-border);
+    border-radius: 14px;
+    padding: 24px;
+    width: 100%;
+    max-width: 650px;
+    margin-top: 15px;
+    backdrop-filter: blur(10px);
+}
+
+.synthesis-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--glass-border);
+    padding-bottom: 12px;
+}
+
+.synthesis-tag {
+    background: rgba(102, 252, 241, 0.1);
+    color: var(--accent);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.synthesis-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+.synth-col {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.synth-col.highlight {
+    background: rgba(102, 252, 241, 0.05);
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(102, 252, 241, 0.2);
+}
+
+.synth-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+    font-weight: 700;
+}
+
+.synth-col p {
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    margin: 0;
+    line-height: 1.4;
+}
+
+@media (max-width: 768px) {
+    .synthesis-grid {
+        grid-template-columns: 1fr;
+    }
 }
